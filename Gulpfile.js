@@ -99,7 +99,7 @@ gulp.task('script', function() {
 			presets: ['es2015']
 		}))
 		.pipe(beautify())
-		//.pipe(concat(settings.paths.scripts.distFile))
+		.pipe(concat(settings.paths.scripts.distFile))
 		.pipe(gulp.dest(settings.paths.scripts.dist))
 		.pipe(gulpIf(settings.production, uglify()))
 		.pipe(rename({
@@ -130,7 +130,7 @@ gulp.task('style', function() {
 	gulp.src(settings.paths.style.src)
 	.pipe(plumber())
 	.pipe(sass().on('error', sass.logError))
-	//.pipe(concat(settings.paths.style.distFile))
+	.pipe(concat(settings.paths.style.distFile))
 	.pipe(autoprefixer({
 		browsers: ['last 3 versions'],
 		cascade: false
