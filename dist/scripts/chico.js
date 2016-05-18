@@ -55,6 +55,70 @@
     /*eslint-enable no-unused-vars*/
 
     /**
+     * Tab key event.
+     * @constant
+     * @memberof ch
+     * @type {String}
+     */
+    ch.onkeytab = 'tab';
+
+    /**
+     * Enter key event.
+     * @constant
+     * @memberof ch
+     * @type {String}
+     */
+    ch.onkeyenter = 'enter';
+
+    /**
+     * Esc key event.
+     * @constant
+     * @memberof ch
+     * @type {String}
+     */
+    ch.onkeyesc = 'esc';
+
+    /**
+     * Left arrow key event.
+     * @constant
+     * @memberof ch
+     * @type {String}
+     */
+    ch.onkeyleftarrow = 'left_arrow';
+
+    /**
+     * Up arrow key event.
+     * @constant
+     * @memberof ch
+     * @type {String}
+     */
+    ch.onkeyuparrow = 'up_arrow';
+
+    /**
+     * Rigth arrow key event.
+     * @constant
+     * @memberof ch
+     * @type {String}
+     */
+    ch.onkeyrightarrow = 'right_arrow';
+
+    /**
+     * Down arrow key event.
+     * @constant
+     * @memberof ch
+     * @type {String}
+     */
+    ch.onkeydownarrow = 'down_arrow';
+
+    /**
+     * Backspace key event.
+     * @constant
+     * @memberof ch
+     * @type {String}
+     */
+    ch.onkeybackspace = 'backspace';
+
+    /**
      * Method in change of expose a friendly interface of the Chico constructors.
      *
      * @memberof ch
@@ -73,112 +137,15 @@
         ch[(name.charAt(0).toUpperCase() + name.substr(1))] = Klass;
     };
 
-    // Remove no-js classname
-    tiny.removeClass(document.documentElement, 'no-js');
+// Remove the no-js classname from html tag
+tiny.removeClass(document.documentElement, 'no-js');
 
-    // Expose event names
-    for (var m in tiny) {
-        if (/^on\w+/.test(m) && typeof tiny[m] === 'string') {
-            ch[m] = tiny[m];
-        }
+// Expose event names
+for (var m in tiny) {
+    if (/^on\w+/.test(m) && typeof tiny[m] === 'string') {
+        ch[m] = tiny[m];
     }
-
-    // Iphone scale fix
-    scaleFix();
-
-    // Prevent zoom onfocus
-    preventZoom();
-
-    // Fix the broken iPad/iPhone form label click issue
-    fixLabels();
-
-    // Cancel pointers if the user scroll.
-    cancelPointerOnScroll();
-
-    var viewportmeta = document.querySelector('meta[name=viewport]');
-
-    /**
-     * Fixes the broken iPad/iPhone form label click issue.
-     * @name fixLabels
-     * @see Based on: <a href="http://www.quirksmode.org/dom/getstyles.html" target="_blank">http://www.quirksmode.org/dom/getstyles.html</a>
-     */
-    function fixLabels() {
-        var labels = document.getElementsByTagName('label'),
-            el,
-            i = 0;
-
-        function labelTap() {
-            el = document.getElementById(this.getAttribute('for'));
-            if (['radio', 'checkbox'].indexOf(el.getAttribute('type')) !== -1) {
-                el.setAttribute('selected', !el.getAttribute('selected'));
-            } else {
-                el.focus();
-            }
-        }
-
-        for (; labels[i]; i += 1) {
-            if (labels[i].getAttribute('for')) {
-                tiny.on(labels[i], ch.onpointertap, labelTap);
-            }
-        }
-    }
-
-    /**
-     * Cancel pointers if the user scroll.
-     * @name cancelPointerOnScroll
-     */
-    function cancelPointerOnScroll() {
-
-        function blockPointer() {
-            ch.pointerCanceled = true;
-
-            function unblockPointer() {
-                ch.pointerCanceled = false;
-            }
-
-            tiny.once(document, 'touchend', unblockPointer);
-        }
-
-        tiny.on(document, 'touchmove', blockPointer);
-    }
-
-    function gestureStart() {
-        viewportmeta.setAttribute('content', 'width=device-width, minimum-scale=0.25, maximum-scale=1.6');
-    }
-
-    // Fix for iPhone viewport scale bug
-    // http://www.blog.highub.com/mobile-2/a-fix-for-iphone-viewport-scale-bug/
-    // @see View on <a href="https://github.com/h5bp/mobile-boilerplate" target="_blank">https://github.com/h5bp/mobile-boilerplate</a>
-    function scaleFix() {
-        var ua = navigator.userAgent;
-        if (viewportmeta && /iPhone|iPad|iPod/.test(ua) && !/Opera Mini/.test(ua)) {
-            viewportmeta.setAttribute('content', 'width=device-width, minimum-scale=1.0, maximum-scale=1.0');
-            document.addEventListener('gesturestart', gestureStart, false);
-        }
-    }
-
-    // Prevent iOS from zooming onfocus
-    // https://github.com/h5bp/mobile-boilerplate/pull/108
-    // @see View on <a href="https://github.com/h5bp/mobile-boilerplate" target="_blank">https://github.com/h5bp/mobile-boilerplate</a>
-    function preventZoom() {
-        var formFields = document.querySelectorAll('input, select, textarea'),
-            contentString = 'width=device-width,initial-scale=1,maximum-scale=',
-            i = 0;
-
-        if (!viewportmeta) {
-            return;
-        }
-
-        for (; i < formFields.length; i += 1) {
-            formFields[i].onfocus = function() {
-                viewportmeta.setAttribute('content', contentString + '1');
-            };
-
-            formFields[i].onblur = function () {
-                viewportmeta.setAttribute('content', contentString + '10');
-            };
-        }
-    }
+}
 
 	ch.version = '2.0.4';
 	window.ch = ch;
@@ -1303,6 +1270,191 @@
 (function (window, ch) {
     'use strict';
 
+    var document = window.document,
+        codeMap = {
+            '8': ch.onkeybackspace,
+            '9': ch.onkeytab,
+            '13': ch.onkeyenter,
+            '27': ch.onkeyesc,
+            '37': ch.onkeyleftarrow,
+            '38': ch.onkeyuparrow,
+            '39': ch.onkeyrightarrow,
+            '40': ch.onkeydownarrow
+        },
+
+        /**
+         * Shortcuts
+         * @memberof ch
+         * @namespace
+         */
+        shortcuts = {
+
+            '_active': null,
+
+            '_queue': [],
+
+            '_collection': {},
+
+            /**
+             * Add a callback to a shortcut with given name.
+             * @param {(ch.onkeybackspace | ch.onkeytab | ch.onkeyenter | ch.onkeyesc | ch.onkeyleftarrow | ch.onkeyuparrow | ch.onkeyrightarrow | ch.onkeydownarrow)} shortcut Shortcut to subscribe.
+             * @param {String} name A name to add in the collection.
+             * @param {Function} callback A given function.
+             * @returns {Object} Retuns the ch.shortcuts.
+             * @example
+             * // Add a callback to ESC key with "component" name.
+             * ch.shortcuts.add(ch.onkeyesc, 'component', component.hide);
+             */
+            'add': function (shortcut, name, callback) {
+
+                if (this._collection[name] === undefined) {
+                    this._collection[name] = {};
+                }
+
+                if (this._collection[name][shortcut] === undefined) {
+                    this._collection[name][shortcut] = [];
+                }
+
+                this._collection[name][shortcut].push(callback);
+
+                return this;
+
+            },
+
+            /**
+             * Removes a callback from a shortcut with given name.
+             * @param {String} name A name to remove from the collection.
+             * @param {(ch.onkeybackspace | ch.onkeytab | ch.onkeyenter | ch.onkeyesc | ch.onkeyleftarrow | ch.onkeyuparrow | ch.onkeyrightarrow | ch.onkeydownarrow)} [shortcut] Shortcut to unsubscribe.
+             * @param {Function} callback A given function.
+             * @returns {Object} Retuns the ch.shortcuts.
+             * @example
+             * // Remove a callback from ESC key with "component" name.
+             * ch.shortcuts.remove(ch.onkeyesc, 'component', component.hide);
+             */
+            'remove': function (name, shortcut, callback) {
+                var evt,
+                    evtCollection,
+                    evtCollectionLenght;
+
+                if (name === undefined) {
+                    throw new Error('Shortcuts - "remove(name, shortcut, callback)": "name" parameter must be defined.');
+                }
+
+                if (shortcut === undefined) {
+                    delete this._collection[name];
+                    return this;
+                }
+
+                if (callback === undefined) {
+                    delete this._collection[name][shortcut];
+                    return this;
+                }
+
+                evtCollection = this._collection[name][shortcut];
+
+                evtCollectionLenght = evtCollection.length;
+
+                for (evt = 0; evt < evtCollectionLenght; evt += 1) {
+
+                    if (evtCollection[evt] === callback) {
+                        evtCollection.splice(evt, 1);
+                    }
+                }
+
+                return this;
+
+            },
+
+            /**
+             * Turn on shortcuts associated to a given name.
+             * @param {String} name A given name from the collection.
+             * @returns {Object} Retuns the ch.shortcuts.
+             * @example
+             * // Turn on shortcuts associated to "component" name.
+             * ch.shortcuts.on('component');
+             */
+            'on': function (name) {
+                var queueLength = this._queue.length,
+                    item = queueLength - 1;
+
+                // check if the instance exist and move the order, adds it at the las position and removes the current
+                for (item; item >= 0; item -= 1) {
+                    if (this._queue[item] === name) {
+                        this._queue.splice(item, 1);
+                    }
+                }
+
+                this._queue.push(name);
+                this._active = name;
+
+                return this;
+            },
+
+            /**
+             * Turn off shortcuts associated to a given name.
+             * @param {String} name A given name from the collection.
+             * @returns {Object} Retuns the ch.shortcuts.
+             * @example
+             * // Turn off shortcuts associated to "component" name.
+             * ch.shortcuts.off('component');
+             */
+            'off': function (name) {
+                var queueLength = this._queue.length,
+                    item = queueLength - 1;
+
+                for (item; item >= 0; item -= 1) {
+                    if (this._queue[item] === name) {
+                        // removes the instance that I'm setting off
+                        this._queue.splice(item, 1);
+
+                        // the queue is full
+                        if (this._queue.length > 0) {
+                            this._active = this._queue[this._queue.length - 1];
+                        } else {
+                        // the queue no has elements
+                            this._active = null;
+                        }
+                    }
+                }
+
+                return this;
+            }
+        },
+        shortcutsEmitter = function (event) {
+            var keyCode = event.keyCode.toString(),
+                shortcut = codeMap[keyCode],
+                callbacks,
+                callbacksLenght,
+                i = 0;
+
+            if (shortcut !== undefined && shortcuts._active !== null) {
+                callbacks = shortcuts._collection[shortcuts._active][shortcut];
+
+                event.shortcut = shortcut;
+
+
+                if (callbacks !== undefined) {
+
+                    callbacksLenght = callbacks.length;
+
+                    for (i = 0; i < callbacksLenght; i += 1) {
+                        callbacks[i](event);
+                    }
+
+                }
+
+            }
+        };
+
+    tiny.on(document, 'keydown', shortcutsEmitter);
+
+    ch.shortcuts = shortcuts;
+
+}(this, this.ch));
+
+(function (window, ch) {
+    'use strict';
+
     var uid = 0;
 
     /**
@@ -1551,6 +1703,1259 @@
     ch.Component = Component;
 
 }(this, this.ch));
+
+(function (window, ch) {
+    'use strict';
+
+    /**
+     * Form is a controller of DOM's HTMLFormElement.
+     * @memberof ch
+     * @constructor
+     * @augments ch.Component
+     * @requires ch.Validations
+     * @param {HTMLElement} el A HTMLElement to create an instance of ch.Form.
+     * @param {Object} [options] Options to customize an instance.
+     * @param {Object} [options.messages] A collections of validations messages.
+     * @param {String} [options.messages.required] A validation message.
+     * @param {String} [options.messages.string] A validation message.
+     * @param {String} [options.messages.url] A validation message.
+     * @param {String} [options.messages.email] A validation message.
+     * @param {String} [options.messages.maxLength] A validation message.
+     * @param {String} [options.messages.minLength] A validation message.
+     * @param {String} [options.messages.custom] A validation message.
+     * @param {String} [options.messages.number] A validation message.
+     * @param {String} [options.messages.min] A validation message.
+     * @param {String} [options.messages.max] A validation message.
+     * @returns {form} Returns a new instance of Form.
+     * @example
+     * // Create a new Form.
+     * var form = new ch.Form(el, [options]);
+     * @example
+     * // Create a new Form with custom messages.
+     * var form = new ch.Form({
+     *     'messages': {
+     *          'required': 'Some message!',
+     *          'email': 'Another message!'
+     *     }
+     * });
+     */
+    function Form(el, options) {
+
+        /**
+         * Reference to context of an instance.
+         * @type {Object}
+         * @private
+         */
+        var that = this;
+
+        that._init(el, options);
+
+        if (this.initialize !== undefined) {
+            /**
+             * If you define an initialize method, it will be executed when a new Form is created.
+             * @memberof! ch.Form.prototype
+             * @function
+             */
+            this.initialize();
+        }
+
+        /**
+         * It emits an event when the form is ready to use.
+         * @event ch.Form#ready
+         * @example
+         * // Subscribe to "ready" event.
+         * form.on('ready', function () {
+         *     // Some code here!
+         * });
+         */
+        window.setTimeout(function () { that.emit('ready'); }, 50);
+    }
+
+    // Inheritance
+    tiny.inherits(Form, ch.Component);
+
+    var parent = Form.super_.prototype;
+
+    /**
+     * The name of the component.
+     * @memberof! ch.Form.prototype
+     * @type {String}
+     */
+    Form.prototype.name = 'form';
+
+    /**
+     * Returns a reference to the constructor function.
+     * @memberof! ch.Form.prototype
+     * @function
+     */
+    Form.prototype.constructor = Form;
+
+    /**
+     * Initialize a new instance of Form and merge custom options with defaults options.
+     * @memberof! ch.Form.prototype
+     * @function
+     * @private
+     * @returns {form}
+     */
+    Form.prototype._init = function (el, options) {
+        // Call to its parent init method
+        parent._init.call(this, el, options);
+
+        /**
+         * Reference to context of an instance.
+         * @type {Object}
+         * @private
+         */
+        var that = this;
+
+        /**
+         * A collection of active errors.
+         * @type {Array}
+         */
+        this.errors = [];
+
+        /**
+         * Collection of defined messages.
+         * @type {Object}
+         * @private
+         */
+        this._messages = this._options.messages || {};
+
+        /**
+         * A collection of validations instances.
+         * @type {Array}
+         */
+        this.validations = [];
+
+        /**
+         * The form container.
+         * @type {HTMLElement}
+         */
+        this.container = this._el;
+            // Add classname
+        tiny.addClass(this.container, 'ch-form');
+            // Disable HTML5 browser-native validations
+        this.container.setAttribute('novalidate', 'novalidate');
+            // Bind the submit
+        tiny.on(this.container, 'submit', function (event) {
+            // Runs validations
+            that.validate(event);
+        });
+
+        // Bind the reset
+        if (this.container.querySelector('input[type="reset"]')) {
+            tiny.on(this.container.querySelector('input[type="reset"]'), ch.onpointertap, function (event) {
+                event.preventDefault();
+                that.reset();
+            });
+        }
+        // Stub for EventEmitter to prevent the errors throwing
+        this.on('error', function(){});
+
+        // Clean validations
+        this.on('disable', this.clear);
+
+        return this;
+    };
+
+    /**
+     * Executes all validations.
+     * @memberof! ch.Form.prototype
+     * @function
+     * @returns {form}
+     */
+    Form.prototype.validate = function (event) {
+
+        if (!this._enabled) {
+            return this;
+        }
+
+        /**
+         * It emits an event when the form will be validated.
+         * @event ch.Form#beforevalidate
+         * @example
+         * // Subscribe to "beforevalidate" event.
+         * component.on('beforevalidate', function () {
+         *     // Some code here!
+         * });
+         */
+        this.emit('beforevalidate');
+
+        /**
+         * Reference to context of an instance.
+         * @type {Object}
+         * @private
+         */
+        var that = this,
+            i = 0,
+            j = that.validations.length,
+            validation,
+            firstError,
+            firstErrorVisible,
+            triggerError;
+
+        this.errors.length = 0;
+
+        // Run validations
+        for (i; i < j; i += 1) {
+            validation = that.validations[i];
+
+            // Validate
+            validation.validate();
+
+            // Store validations with errors
+            if (validation.isShown()) {
+                that.errors.push(validation);
+            }
+        }
+
+        // Is there's an error
+        if (that.errors.length > 0) {
+            firstError = that.errors[0];
+            firstErrorVisible = firstError.trigger;
+
+            // Find the closest visible parent if current element is hidden
+            while (tiny.css(firstErrorVisible, 'display') === 'none' && firstErrorVisible !== document.documentElement) {
+                firstErrorVisible = firstErrorVisible.parentElement;
+            }
+
+            firstErrorVisible.scrollIntoView();
+
+            // Issue UI-332: On validation must focus the first field with errors.
+            // Doc: http://wiki.ml.com/display/ux/Mensajes+de+error
+            triggerError = firstError.trigger;
+
+            if (triggerError.tagName === 'DIV') {
+                firstError.trigger.querySelector('input:first-child').focus();
+            }
+
+            if (triggerError.type !== 'hidden' || triggerError.tagName === 'SELECT') {
+                triggerError.focus();
+            }
+
+            if (event && event.preventDefault) {
+                event.preventDefault();
+            }
+
+            /**
+             * It emits an event when a form has got errors.
+             * @event ch.Form#error
+             * @example
+             * // Subscribe to "error" event.
+             * form.on('error', function (errors) {
+             *     console.log(errors.length);
+             * });
+             */
+            this.emit('error', this.errors);
+
+        } else {
+
+            /**
+             * It emits an event when a form hasn't got errors.
+             * @event ch.Form#success
+             * @example
+             * // Subscribe to "success" event.
+             * form.on("submit",function () {
+             *     // Some code here!
+             * });
+             * @example
+             * // Subscribe to "success" event and prevent the submit event.
+             * form.on("submit",function (event) {
+             *     event.preventDefault();
+             *     // Some code here!
+             * });
+             */
+            this.emit('success', event);
+        }
+
+        return this;
+    };
+
+    /**
+     * Checks if the form has got errors but it doesn't show bubbles.
+     * @memberof! ch.Form.prototype
+     * @function
+     * @returns {Boolean}
+     * @example
+     * // Checks if a form has errors and do something.
+     * if (form.hasError()) {
+     *     // Some code here!
+     * };
+     */
+    Form.prototype.hasError = function () {
+
+        if (!this._enabled) {
+            return false;
+        }
+
+        this.errors.length = 0;
+
+        var i = 0,
+            j = this.validations.length,
+            validation;
+
+        // Run hasError
+        for (i; i < j; i += 1) {
+
+            validation = this.validations[i];
+
+            if (validation.hasError()) {
+                this.errors.push(validation);
+            }
+
+        }
+
+        return this.errors.length > 0;
+    };
+
+    /**
+     * Clear all active errors.
+     * @memberof! ch.Form.prototype
+     * @function
+     * @returns {form}
+     * @example
+     * // Clear active errors.
+     * form.clear();
+     */
+    Form.prototype.clear = function () {
+        var i = 0,
+            j = this.validations.length;
+
+        for (i; i < j; i += 1) {
+            this.validations[i].clear();
+        }
+
+        /**
+         * It emits an event when the form is cleaned.
+         * @event ch.Form#clear
+         * @example
+         * // Subscribe to "clear" event.
+         * form.on('clear', function () {
+         *     // Some code here!
+         * });
+         */
+        this.emit('clear');
+
+        return this;
+    };
+
+    /**
+     * Clear all active errors and executes the reset() native mehtod.
+     * @memberof! ch.Form.prototype
+     * @function
+     * @returns {form}
+     * @example
+     * // Resets form fields and clears active errors.
+     * form.reset();
+     */
+    Form.prototype.reset = function () {
+
+        // Clears all shown validations
+        this.clear();
+
+        // Executes the native reset() method
+        this._el.reset();
+
+        /**
+         * It emits an event when a form resets its fields.
+         * @event ch.Form#reset
+         * @example
+         * // Subscribe to "reset" event.
+         * form.on('reset', function () {
+         *     // Some code here!
+         * });
+         */
+        this.emit('reset');
+
+        return this;
+    };
+
+    /**
+     * Destroys a Form instance.
+     * @memberof! ch.Form.prototype
+     * @function
+     * @example
+     * // Destroy a form
+     * form.destroy();
+     * // Empty the form reference
+     * form = undefined;
+     */
+    Form.prototype.destroy = function () {
+
+        // this.$container.off('.form')
+        this.container.removeAttribute('novalidate');
+
+        this.validations.forEach(function (e) {
+            e.destroy();
+        });
+
+        parent.destroy.call(this);
+
+        return;
+    };
+
+    // Factorize
+    ch.factory(Form);
+
+}(this, this.ch));
+
+(function (ch) {
+    'use strict';
+
+    // Private Members
+    var conditions = {
+        'string': {
+            'fn': function (value) {
+                // the following regular expression has the utf code for the lating characters
+                // the ranges are A,EI,O,U,a,ei,o,u,ç,Ç please for reference see http://www.fileformat.info/info/charset/UTF-8/list.htm
+                return (/^([a-zA-Z\u00C0-\u00C4\u00C8-\u00CF\u00D2-\u00D6\u00D9-\u00DC\u00E0-\u00E4\u00E8-\u00EF\u00F2-\u00F6\u00E9-\u00FC\u00C7\u00E7\s]*)$/i).test(value);
+            },
+            'message': 'Use only letters.'
+        },
+        'email': {
+            'fn': function (value) {
+                return (/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/i).test(value);
+            },
+            'message': 'Use a valid e-mail such as name@example.com.'
+        },
+        'url': {
+            'fn': function (value) {
+                return (/^((https?|ftp|file):\/\/|((www|ftp)\.)|(\/|.*\/)*)[a-z0-9-]+((\.|\/)[a-z0-9-]+)+([/?].*)?$/i).test(value);
+            },
+            'message': 'It must be a valid URL.'
+        },
+        'minLength': {
+            'fn': function (a, b) { return a.length >= b; },
+            'message': 'Enter at least {#num#} characters.'
+        },
+        'maxLength': {
+            'fn': function (a, b) { return a.length <= b; },
+            'message': 'The maximum amount of characters is {#num#}.'
+        },
+        'number': {
+            'fn': function (value) {
+                return (/^(-?[0-9]+)$/i).test(value);
+            },
+            'message': 'Use only numbers.'
+        },
+        'max': {
+            'fn': function (a, b) { return a <= b; },
+            'message': 'The amount must be smaller than {#num#}.'
+        },
+        'min': {
+            'fn': function (a, b) { return a >= b; },
+            'message': 'The amount must be higher than {#num#}.'
+        },
+        'required': {
+            'fn': function (value) {
+
+                var tag = tiny.hasClass(this.trigger, 'ch-form-options') ? 'OPTIONS' : this._el.tagName,
+                    validated;
+
+                switch (tag) {
+                case 'OPTIONS':
+                    validated = this.trigger.querySelectorAll('input:checked').length !== 0;
+                    break;
+
+                case 'SELECT':
+                    validated = (value !== '-1' && value !== '');
+                    break;
+
+                // INPUTS and TEXTAREAS
+                default:
+                    validated = value.replace(/^\s+|\s+$/g, '').length !== 0;
+                    break;
+                }
+
+                return validated;
+            },
+            'message': 'Fill in this information.'
+        },
+        'custom': {
+            // I don't have pre-conditions, comes within conf.fn argument
+            'message': 'Error'
+        }
+    };
+
+    /**
+     * Condition utility.
+     * @memberof ch
+     * @constructor
+     * @requires ch.Validation
+     * @param {Array} [condition] A conditions to validate.
+     * @param {String} [condition.name] The name of the condition.
+     * @param {String} [condition.message] The given error message to the condition.
+     * @param {String} [condition.fn] The method to validate a given condition.
+     * @returns {condition} Returns a new instance of Condition.
+     * @example
+     * // Create a new condition object with patt.
+     * var condition = ch.Condition({
+     *     'name': 'string',
+     *     'patt': /^([a-zA-Z\u00C0-\u00C4\u00C8-\u00CF\u00D2-\u00D6\u00D9-\u00DC\u00E0-\u00E4\u00E8-\u00EF\u00F2-\u00F6\u00E9-\u00FC\u00C7\u00E7\s]*)$/,
+     *     'message': 'Some message here!'
+     * });
+     * @example
+     * //Create a new condition object with expr.
+     * var condition = ch.Condition({
+     *     'name': 'maxLength',
+     *     'patt': function(a,b) { return a.length <= b },
+     *     'message': 'Some message here!',
+     *     'value': 4
+     * });
+     * @example
+     * // Create a new condition object with func.
+     * var condition = ch.Condition({
+     *     'name': 'custom',
+     *     'patt': function (value) {
+     *         if (value === 'ChicoUI') {
+     *
+     *             // Some code here!
+     *
+     *             return true;
+     *         };
+     *
+     *         return false;
+     *     },
+     *     'message': 'Your message here!'
+     * });
+     */
+    function Condition(condition) {
+
+        tiny.extend(this, conditions[condition.name], condition);
+
+        // replaces the condition default message in the following conditions max, min, minLenght, maxLenght
+        if (this.name === 'min' || this.name === 'max' || this.name === 'minLength' || this.name === 'maxLength') {
+            this.message = this.message.replace('{#num#}', this.num);
+        }
+
+        this._enabled = true;
+
+        return this;
+    }
+
+    /**
+     * The name of the component.
+     * @memberof! ch.Condition.prototype
+     * @type {String}
+     */
+    Condition.prototype.name = 'condition';
+
+    /**
+     * Returns a reference to the constructor function.
+     * @memberof! ch.Condition.prototype
+     * @function
+     */
+    Condition.prototype.constructor = Condition;
+
+    /**
+     * Enables an instance of condition.
+     * @memberof! ch.Condition.prototype
+     * @function
+     * @returns {condition}
+     * @example
+     * // Enabling an instance of Condition.
+     * condition.enable();
+     * @example
+     * // Enabling a condition.
+     * condition.enable();
+     */
+    Condition.prototype.enable = function () {
+        this._enabled = true;
+
+        return this;
+    };
+
+    /**
+     * Disables an instance of a condition.
+     * @memberof! ch.Condition.prototype
+     * @function
+     * @returns {condition}
+     * @example
+     * // Disabling an instance of Condition.
+     * condition.disable();
+     * @example
+     * // Disabling a condition.
+     * condition.disable();
+     */
+    Condition.prototype.disable = function () {
+        this._enabled = false;
+
+        return this;
+    };
+
+    /**
+     * Enables an instance of condition.
+     * @memberof! ch.Condition.prototype
+     * @function
+     * @param {(String | Number)} value A given value.
+     * @param {condition} validation A given validation to execute.
+     * @returns {Boolean} Returns a boolean indicating whether the condition fails or not.
+     * @example
+     * // Testing a condition.
+     * condition.test('foobar', validationA);
+     */
+    Condition.prototype.test = function (value, validation) {
+
+        if (!this._enabled) {
+            return true;
+        }
+
+        return this.fn.call(validation, value, this.num);
+    };
+
+    ch.Condition = Condition;
+
+}(this.ch));
+
+(function (window, ch) {
+    'use strict';
+
+    /**
+     * Validation is an engine to validate HTML forms elements.
+     * @memberof ch
+     * @constructor
+     * @augments ch.Component
+     * @requires ch.Condition
+     * @requires ch.Form
+     * @requires ch.Bubble
+     * @param {HTMLElement} el A HTMLElement to create an instance of ch.Validation.
+     * @param {Object} [options] Options to customize an instance.
+     * @param {Array} [options.conditions] A collection of conditions to validate.
+     * @param {String} [options.conditions.name] The name of the condition.
+     * @param {String} [options.conditions.message] The given error message to the condition.
+     * @param {String} [options.conditions.fn] The method to validate a given condition.
+     * @param {HTMLElement} [options.reference] It's a reference to position and size of element that will be considered to carry out the position.
+     * @param {String} [options.side] The side option where the target element will be positioned. Default: "right".
+     * @param {String} [options.align] The align options where the target element will be positioned. Default: "top".
+     * @param {Number} [options.offsetX] Distance to displace the target horizontally. Default: 10.
+     * @param {Number} [options.offsetY] Distance to displace the target vertically. Default: 0.
+     * @param {String} [options.position] The type of positioning used. Default: "absolute".
+     * @returns {validation} Returns a new instance of Validation.
+     * @example
+     * // Create a new Validation.
+     * var validation = new ch.Validation(document.querySelector('.name-field'), [options]);
+     * @example
+     * // Create a validation with with custom options.
+     * var validation = new ch.Validation({
+     *     'conditions': [
+     *         {
+     *             'name': 'required',
+     *             'message': 'Please, fill in this information.'
+     *         },
+     *         {
+     *             'name': 'custom-email',
+     *             'fn': function (value) { return value === "customail@custom.com"; },
+     *             'message': 'Use a valid e-mail such as name@custom.com.'
+     *         }
+     *     ],
+     *     'offsetX': 0,
+     *     'offsetY': 10,
+     *     'side': 'bottom',
+     *     'align': 'left'
+     * });
+     */
+    function Validation(el, options) {
+
+        /**
+         * Reference to context of an instance.
+         * @type {Object}
+         * @private
+         */
+        var that = this;
+
+        this._init(el, options);
+
+        if (this.initialize !== undefined) {
+            /**
+             * If you define an initialize method, it will be executed when a new Validation is created.
+             * @memberof! ch.Validation.prototype
+             * @function
+             */
+            this.initialize();
+        }
+
+        /**
+         * Event emitted when the component is ready to use.
+         * @event ch.Validation#ready
+         * @example
+         * // Subscribe to "ready" event.
+         * validation.on('ready', function () {
+         *     // Some code here!
+         * });
+         */
+        window.setTimeout(function () { that.emit('ready'); }, 50);
+    }
+
+    // Inheritance
+    tiny.inherits(Validation, ch.Component);
+
+    var parent = Validation.super_.prototype,
+        // Creates methods enable and disable into the prototype.
+        methods = ['enable', 'disable'],
+        len = methods.length;
+
+    function createMethods(method) {
+        Validation.prototype[method] = function (condition) {
+            var key;
+
+            // Specific condition
+            if (condition !== undefined && this.conditions[condition] !== undefined) {
+
+                this.conditions[condition][method]();
+
+            } else {
+
+                // all conditions
+                for (key in this.conditions) {
+                    if (this.conditions[key] !== undefined) {
+                        this.conditions[key][method]();
+                    }
+                }
+
+                parent[method].call(this);
+            }
+
+            return this;
+        };
+    }
+
+    /**
+     * The name of the component.
+     * @memberof! ch.Validation.prototype
+     * @type {String}
+     */
+    Validation.prototype.name = 'validation';
+
+    /**
+     * Returns a reference to the constructor function.
+     * @memberof! ch.Validation.prototype
+     * @function
+     */
+    Validation.prototype.constructor = Validation;
+
+    /**
+     * Configuration by default.
+     * @type {Object}
+     * @private
+     */
+    Validation.prototype._defaults = {
+        'offsetX': 10
+    };
+
+    /**
+     * Initialize a new instance of Validation and merge custom options with defaults options.
+     * @memberof! ch.Validation.prototype
+     * @function
+     * @private
+     * @returns {validation}
+     */
+    Validation.prototype._init = function (el, options) {
+
+        /**
+         * Reference to context of an instance.
+         * @type {Object}
+         * @private
+         */
+        var that = this;
+
+        parent._init.call(this, el, options);
+
+        /**
+         * The validation trigger.
+         * @type {HTMLElement}
+         */
+        this.trigger = this._el;
+
+        /**
+         * The validation container.
+         * @type {HTMLElement}
+         */
+        this._configureContainer();
+
+        /**
+         * The collection of conditions.
+         * @type {Object}
+         */
+        this.conditions = {};
+
+        // Merge conditions
+        this._mergeConditions(options.conditions);
+
+        /**
+         * Flag that let you know if there's a validation going on.
+         * @type {Boolean}
+         * @private
+         */
+        this._shown = false;
+
+        /**
+         * The current error. If the validations has not error is "null".
+         * @type {Object}
+         */
+        this.error = null;
+
+        this
+            // Clean the validation if is shown;
+            .on('disable', this.clear);
+
+        this.on('error', this._handleError);
+
+        /**
+         * Reference to a Form instance. If there isn't any, the Validation instance will create one.
+         * @type {form}
+         */
+        this.form = (ch.instances[tiny.parent(that.trigger, 'form').getAttribute('data-uid')] || new ch.Form(tiny.parent(that.trigger, 'form')));
+
+        this.form.validations.push(this);
+
+        /**
+         * Set a validation event to add listeners.
+         * @private
+         */
+        this._validationEvent = (tiny.hasClass(this.trigger, 'ch-form-options') || this._el.tagName === 'SELECT' || (this._el.tagName === 'INPUT' && this._el.type === 'range')) ? 'change' : 'blur';
+
+        return this;
+    };
+
+    /**
+     * Merges the collection of conditions with a given conditions.
+     * @function
+     * @private
+     */
+    Validation.prototype._mergeConditions = function (conditions) {
+        var i = 0,
+            j = conditions.length;
+
+        for (i; i < j; i += 1) {
+            this.conditions[conditions[i].name] = new ch.Condition(conditions[i]);
+        }
+
+        return this;
+    };
+
+    /**
+     * Validates the value of $el.
+     * @memberof! ch.Validation.prototype
+     * @function
+     * @returns {validation}
+     */
+    Validation.prototype.validate = function () {
+
+        if (this.hasError()) {
+            this._error();
+        } else {
+            this._success();
+        }
+
+        return this;
+    };
+
+    /**
+     * If the validation has got an error executes this function.
+     * @private
+     */
+    Validation.prototype._error = function () {
+
+        /**
+         * Reference to context of an instance.
+         * @type {Object}
+         * @private
+         */
+        var that = this,
+            previousValue;
+
+        // It must happen only once.
+        tiny.on(this.trigger, this._validationEvent, function () {
+
+            if (previousValue !== this.value || that._validationEvent === 'change' && that.isShown()) {
+                previousValue = this.value;
+                that.validate();
+            }
+
+            if (that.conditions.required === undefined && this.value === '') {
+                that.clear();
+            }
+
+        });
+
+        /**
+         * It emits an error event when a validation got an error.
+         * @event ch.Validation#error
+         *
+         * @example
+         * // Subscribe to "error" event.
+         * validation.on('error', function (errors) {
+         *     console.log(errors.length);
+         * });
+         */
+        this.emit('error', this.error);
+
+        return this;
+    };
+
+    /**
+     * Internal error handler, shows the errors when needed
+     *
+     * @param err {Object} A ch.Validation#error object that contain the error message and the error condition
+     * @private
+     */
+    Validation.prototype._handleError = function(err) {
+        var that = this;
+
+        if (!that._previousError.condition || !that._shown) {
+            if (that._el.nodeName === 'INPUT' || that._el.nodeName === 'TEXTAREA') {
+                tiny.addClass(that.trigger, 'ch-validation-error');
+            }
+
+            that._showErrorMessage(err.message || 'Error');
+        }
+
+        if (err.condition !== that._previousError.condition) {
+            that._showErrorMessage(err.message || that.form._messages[err.condition] || 'Error');
+        }
+
+        that._shown = true;
+    };
+
+    /**
+     * If the validation hasn't got an error executes this function.
+     * @private
+     */
+    Validation.prototype._success = function () {
+
+        // Status OK (with previous error) this._previousError
+        if (this._shown || !this._enabled) {
+            // Public status OK
+            this._shown = false;
+        }
+
+        this.trigger.removeAttribute('aria-label');
+        tiny.removeClass(this.trigger, 'ch-validation-error');
+
+
+        this._hideErrorMessage();
+
+        /**
+         * It emits an event when a validation hasn't got an error.
+         * @event ch.Validation#success
+         * @example
+         * // Subscribe to "success" event.
+         * validation.on("submit",function () {
+         *     // Some code here!
+         * });
+         */
+        this.emit('success');
+
+        return this;
+    };
+
+    /**
+     * Checks if the validation has got errors but it doesn't show bubbles.
+     * @memberof! ch.Validation.prototype
+     * @function
+     * @returns {Boolean}
+     * @example
+     * // Checks if a validation has errors and do something.
+     * if (validation.hasError()) {
+     *     // Some code here!
+     * };
+     */
+    Validation.prototype.hasError = function () {
+
+        // Pre-validation: Don't validate disabled
+        if (this.trigger.getAttribute('disabled') || !this._enabled) {
+            return false;
+        }
+
+        var condition,
+            required = this.conditions.required,
+            value = this._el.value;
+
+        // Avoid fields that aren't required when they are empty or de-activated
+        if (!required && value === '' && this._shown === false) {
+            // Has got an error? Nop
+            return false;
+        }
+
+        /**
+         * Stores the previous error object
+         * @private
+         */
+        this._previousError = tiny.clone(this.error);
+
+        // for each condition
+        for (condition in this.conditions) {
+
+            if (this.conditions[condition] !== undefined && !this.conditions[condition].test(value, this)) {
+                // Update the error object
+                this.error = {
+                    'condition': condition,
+                    'message': this.conditions[condition].message
+                };
+
+                // Has got an error? Yeah
+                return true;
+            }
+
+        }
+
+        // Update the error object
+        this.error = null;
+
+        // Has got an error? No
+        return false;
+    };
+
+    /**
+     * Clear active error.
+     * @memberof! ch.Validation.prototype
+     * @function
+     * @returns {validation}
+     * @example
+     * // Clear active error.
+     * validation.clear();
+     */
+    Validation.prototype.clear = function () {
+
+        this.trigger.removeAttribute('aria-label');
+        tiny.removeClass(this.trigger, 'ch-validation-error');
+
+        this.error = null;
+
+        this._hideErrorMessage();
+
+        this._shown = false;
+
+        /**
+         * It emits an event when a validation is cleaned.
+         * @event ch.Validation#clear
+         * @example
+         * // Subscribe to "clear" event.
+         * validation.on('clear', function () {
+         *     // Some code here!
+         * });
+         */
+        this.emit('clear');
+
+        return this;
+    };
+
+    /**
+     * Indicates if the validation is shown.
+     * @memberof! ch.Validation.prototype
+     * @function
+     * @returns {Boolean}
+     * @example
+     * // Execute a function if the validation is shown.
+     * if (validation.isShown()) {
+     *     fn();
+     * }
+     */
+    Validation.prototype.isShown = function () {
+        return this._shown;
+    };
+
+    /**
+     * Sets or gets messages to specifics conditions.
+     * @memberof! ch.Validation.prototype
+     * @function
+     * @returns {(validation | String)}
+     * @example
+     * // Gets a message from a condition
+     * validation.message('required');
+     * @example
+     * // Sets a new message
+     * validation.message('required', 'New message for required validation');
+     */
+    Validation.prototype.message = function (condition, message) {
+
+        if (condition === undefined) {
+            throw new Error('validation.message(condition, message): Please, a condition parameter is required.');
+        }
+
+        // Get a new message from a condition
+        if (message === undefined) {
+            return this.conditions[condition].message;
+        }
+
+        // Sets a new message
+        this.conditions[condition].message = message;
+
+        if (this.isShown() && this.error.condition === condition) {
+            this._showErrorMessage(message);
+        }
+
+        return this;
+    };
+
+    /**
+     * Enables an instance of validation or a specific condition.
+     * @memberof! ch.Validation.prototype
+     * @name enable
+     * @function
+     * @param {String} [condition] - A given number of fold to enable.
+     * @returns {validation} Returns an instance of Validation.
+     * @example
+     * // Enabling an instance of Validation.
+     * validation.enable();
+     * @example
+     * // Enabling the "max" condition.
+     * validation.enable('max');
+     */
+
+    /**
+     * Disables an instance of a validation or a specific condition.
+     * @memberof! ch.Validation.prototype
+     * @name disable
+     * @function
+     * @param {String} [condition] - A given number of fold to disable.
+     * @returns {validation} Returns an instance of Validation.
+     * @example
+     * // Disabling an instance of Validation.
+     * validation.disable();
+     * @example
+     * // Disabling the "email" condition.
+     * validation.disable('email');
+     */
+    while (len) {
+        createMethods(methods[len -= 1]);
+    }
+
+    /**
+     * Destroys a Validation instance.
+     * @memberof! ch.Validation.prototype
+     * @function
+     * @example
+     * // Destroying an instance of Validation.
+     * validation.destroy();
+     */
+    Validation.prototype.destroy = function () {
+
+        // this.$trigger.off('.validation')
+        this.trigger.removeAttribute('data-side data-align');
+
+        parent.destroy.call(this);
+
+        return;
+    };
+
+    // Factorize
+    ch.factory(Validation);
+
+}(this, this.ch));
+
+(function (ch) {
+    'use strict';
+
+    /**
+     * Creates a bubble to show the validation message.
+     * @memberof! ch.Validation.prototype
+     * @function
+     * @private
+     * @returns {validation}
+     */
+    ch.Validation.prototype._configureContainer = function () {
+
+        var that = this;
+
+        /**
+         * Is the little sign that popover showing the validation message. It's a Popover component, so you can change it's content, width or height and change its visibility state.
+         * @type {Bubble}
+         * @see ch.Bubble
+         */
+        this.bubble = this._container = new ch.Bubble({
+            'reference': that._options.reference || (function () {
+                var reference,
+                    trigger = that.trigger,
+                    h4,
+                    span;
+                // CHECKBOX, RADIO
+                // TODO: when old forms be deprecated we must only support ch-form-options class
+                if (tiny.hasClass(trigger, 'ch-form-options')) {
+                // Helper reference from will be fired
+                    if (trigger.querySelectorAll('h4').length > 0) {
+                        // Wrap content with inline element
+                        h4 = trigger.querySelector('h4'); // Find h4
+                        span = document.createElement('span');
+                        span.insertAdjacentHTML('beforeend', h4.innerHTML);
+                        h4.innerHTML = '';
+                        h4.insertBefore(span, h4.firstChild);
+                        reference = h4.children[0]; // Inline element in h4 like helper reference
+                    // Legend
+                    } else if (trigger.previousElementSibling && trigger.previousElementSibling.tagName === 'LEGEND') {
+                        reference = trigger.previousElementSibling; // Legend like helper reference
+                    } else {
+                        reference = trigger.querySelector('label');
+                    }
+                // INPUT, SELECT, TEXTAREA
+                } else {
+                    reference = trigger;
+                }
+
+                return reference;
+            }()),
+            'align': that._options.align,
+            'side': that._options.side,
+            'offsetY': that._options.offsetY,
+            'offsetX': that._options.offsetX
+            // 'position': that._options.position
+        });
+
+    };
+
+    /**
+     * Shows the validation message.
+     * @memberof! ch.Validation.prototype
+     * @function
+     * @private
+     * @returns {validation}
+     */
+    ch.Validation.prototype._showErrorMessage = function (message) {
+        this.bubble.content(message).show();
+        this.trigger.setAttribute('aria-label', 'ch-' + this.bubble.name + '-' + this.bubble.uid);
+
+        return this;
+    };
+
+    /**
+     * Hides the validation message.
+     * @memberof! ch.Validation.prototype
+     * @function
+     * @private
+     * @returns {validation}
+     */
+    ch.Validation.prototype._hideErrorMessage = function () {
+        this.bubble.hide();
+        this.trigger.removeAttribute('aria-label');
+
+        return this;
+    };
+
+    /**
+     * Sets or gets positioning configuration. Use it without arguments to get actual configuration. Pass an argument to define a new positioning configuration.
+     * @memberof! ch.Validation.prototype
+     * @function
+     * @returns {validation}
+     * @example
+     * // Change validaton bubble's position.
+     * validation.refreshPosition({
+     *     offsetY: -10,
+     *     side: 'top',
+     *     align: 'left'
+     * });
+     */
+    ch.Validation.prototype.refreshPosition = function (options) {
+
+        if (options === undefined) {
+            return this.bubble._position;
+        }
+
+        this.bubble.refreshPosition(options);
+
+        return this;
+    };
+
+}(this.ch));
 
 (function (window, ch) {
     'use strict';
@@ -2919,6 +4324,42 @@
 (function (window, ch) {
     'use strict';
 
+    var document = window.document;
+
+    ch.Popover.prototype._hidingShortcuts = function () {
+
+        var that = this;
+
+        function hide(event) {
+            // event.button === 0: Fix issue #933 Right click closes it on Firefox.
+            if (event.target !== that._el && event.target !== that.container && event.button === 0) {
+                that.hide();
+            }
+        }
+
+        ch.shortcuts.add(ch.onkeyesc, this.uid, function () {
+            that.hide();
+        });
+
+        this
+            .on('show', function () {
+                ch.shortcuts.on(that.uid);
+                tiny.on(document, ch.onpointertap, hide);
+            })
+            .on('hide', function () {
+                ch.shortcuts.off(that.uid);
+                tiny.off(document, ch.onpointertap, hide);
+            })
+            .once('destroy', function () {
+                ch.shortcuts.remove(that.uid, ch.onkeyesc);
+            });
+    };
+
+}(this, this.ch));
+
+(function (window, ch) {
+    'use strict';
+
     /**
      * Layer is a dialog window that can be shown one at a time.
      * @memberof ch
@@ -3079,6 +4520,217 @@
     };
 
     ch.factory(Layer, parent._normalizeOptions);
+
+}(this, this.ch));
+
+(function (ch) {
+    'use strict';
+
+    /**
+     * Improves the native tooltips.
+     * @memberof ch
+     * @constructor
+     * @augments ch.Popover
+     * @param {HTMLElement} el A HTMLElement to create an instance of ch.Tooltip.
+     * @param {Object} [options] Options to customize an instance.
+     * @param {String} [options.addClass] CSS class names that will be added to the container on the component initialization.
+     * @param {String} [options.fx] Enable or disable UI effects. You must use: "slideDown", "fadeIn" or "none". Default: "fadeIn".
+     * @param {String} [options.width] Set a width for the container. Default: "auto".
+     * @param {String} [options.height] Set a height for the container. Default: "auto".
+     * @param {String} [options.shownby] Determines how to interact with the trigger to show the container. You must use: "pointertap", "pointerenter" or "none". Default: "pointerenter".
+     * @param {String} [options.hiddenby] Determines how to hide the component. You must use: "button", "pointers", "pointerleave", "all" or "none". Default: "pointerleave".
+     * @param {HTMLElement} [options.reference] It's a reference to position and size of element that will be considered to carry out the position. Default: the trigger element.
+     * @param {String} [options.side] The side option where the target element will be positioned. Its value can be: "left", "right", "top", "bottom" or "center". Default: "bottom".
+     * @param {String} [options.align] The align options where the target element will be positioned. Its value can be: "left", "right", "top", "bottom" or "center". Default: "left".
+     * @param {Number} [options.offsetX] Distance to displace the target horizontally. Default: 0.
+     * @param {Number} [options.offsetY] Distance to displace the target vertically. Default: 10.
+     * @param {String} [options.position] The type of positioning used. Its value must be "absolute" or "fixed". Default: "absolute".
+     * @param {String} [options.method] The type of request ("POST" or "GET") to load content by ajax. Default: "GET".
+     * @param {String} [options.params] Params like query string to be sent to the server.
+     * @param {Boolean} [options.cache] Force to cache the request by the browser. Default: true.
+     * @param {Boolean} [options.async] Force to sent request asynchronously. Default: true.
+     * @param {(String | HTMLElement)} [options.waiting] Temporary content to use while the ajax request is loading. Default: '<div class="ch-loading ch-loading-centered"></div>'.
+     * @param {(String | HTMLElement)} [options.content] The content to be shown into the Tooltip container.
+     * @returns {tooltip} Returns a new instance of Tooltip.
+     * @example
+     * // Create a new Tooltip.
+     * var tooltip = new ch.Tooltip(document.querySelector('.trigger'), [options]);
+     * @example
+     * // Create a new Tooltip using the shorthand way (content as parameter).
+     * var tooltip = new ch.Tooltip(document.querySelector('.trigger'), {'content': 'http://ui.ml.com:3040/ajax'});
+     */
+    function Tooltip(el, options) {
+
+        // TODO: Review what's going on here with options
+        /*
+        if (options === undefined && el !== undefined && el.nodeType !== undefined) {
+            options = el;
+            el = undefined;
+        }
+        */
+
+        options = tiny.extend(tiny.clone(this._defaults), options);
+
+        return new ch.Layer(el, options);
+    }
+
+    /**
+     * The name of the component.
+     * @memberof! ch.Tooltip.prototype
+     * @type {String}
+     * @example
+     * // You can reach the associated instance.
+     * var tooltip = $(selector).data('tooltip');
+     */
+    Tooltip.prototype.name = 'tooltip';
+
+    /**
+     * Returns a reference to the constructor function.
+     * @memberof! ch.Tooltip.prototype
+     * @function
+     */
+    Tooltip.prototype.constructor = Tooltip;
+
+    /**
+     * Configuration by default.
+     * @memberof! ch.Tooltip.prototype
+     * @type {Object}
+     * @private
+     */
+    Tooltip.prototype._defaults = tiny.extend(tiny.clone(ch.Layer.prototype._defaults), {
+        '_className': 'ch-tooltip ch-cone'
+    });
+
+    ch.factory(Tooltip, ch.Layer.prototype._normalizeOptions);
+
+}(this.ch));
+
+(function (window, ch) {
+    'use strict';
+
+    /**
+     * Dialog window with an error skin.
+     * @memberof ch
+     * @constructor
+     * @augments ch.Component
+     * @requires ch.Positioner
+     * @param {HTMLElement} el A HTMLElement to create an instance of ch.Bubble.
+     * @param {Object} [options] Options to customize an instance.
+     * @param {String} [options.addClass] CSS class names that will be added to the container on the component initialization.
+     * @param {String} [options.fx] Enable or disable UI effects. You must use: "slideDown", "fadeIn" or "none". Default: "fadeIn".
+     * @param {String} [options.width] Set a width for the container. Default: "auto".
+     * @param {String} [options.height] Set a height for the container. Default: "auto".
+     * @param {String} [options.shownby] Determines how to interact with the trigger to show the container. You must use: "pointertap", "pointerenter" or "none". Default: "none".
+     * @param {String} [options.hiddenby] Determines how to hide the component. You must use: "button", "pointers", "pointerleave", "all" or "none". Default: "none".
+     * @param {HTMLElement} [options.reference] It's a reference to position and size of element that will be considered to carry out the position. Default: the trigger element.
+     * @param {String} [options.side] The side option where the target element will be positioned. Its value can be: "left", "right", "top", "bottom" or "center". Default: "right".
+     * @param {String} [options.align] The align options where the target element will be positioned. Its value can be: "left", "right", "top", "bottom" or "center". Default: "top".
+     * @param {Number} [options.offsetX] Distance to displace the target horizontally. Default: 10.
+     * @param {Number} [options.offsetY] Distance to displace the target vertically. Default: 0.
+     * @param {String} [options.position] The type of positioning used. Its value must be "absolute" or "fixed". Default: "absolute".
+     * @param {String} [options.method] The type of request ("POST" or "GET") to load content by ajax. Default: "GET".
+     * @param {String} [options.params] Params like query string to be sent to the server.
+     * @param {Boolean} [options.cache] Force to cache the request by the browser. Default: true.
+     * @param {Boolean} [options.async] Force to sent request asynchronously. Default: true.
+     * @param {(String | HTMLElement)} [options.waiting] Temporary content to use while the ajax request is loading. Default: '&lt;div class="ch-loading ch-loading-centered"&gt;&lt;/div&gt;'.
+     * @param {(String | HTMLElement)} [options.content] The content to be shown into the Bubble container. Default: "Check the information, please."
+     * @returns {bubble} Returns a new instance of Bubble.
+     * @example
+     * // Create a new Bubble.
+     * var bubble = new ch.Bubble($el, [options]);
+     * @example
+     * // Create a new Bubble with disabled effects.
+     * var bubble = new ch.Bubble({
+     *     'fx': 'none'
+     * });
+     * @example
+     * // Create a new Bubble using the shorthand way (content as parameter).
+     * var bubble = new ch.Bubble('http://ui.ml.com:3040/ajax');
+     */
+    function Bubble(el, options) {
+        /**
+         * Reference to context of an instance.
+         * @type {Object}
+         * @private
+         */
+        var that = this;
+
+        this._init(el, options);
+
+        if (this.initialize !== undefined) {
+            /**
+             * If you define an initialize method, it will be executed when a new Bubble is created.
+             * @memberof! ch.Bubble.prototype
+             * @function
+             */
+            this.initialize();
+        }
+
+        /**
+         * Event emitted when the component is ready to use.
+         * @event ch.Bubble#ready
+         * @example
+         * // Subscribe to "ready" event.
+         * bubble.on('ready', function () {
+         *     // Some code here!
+         * });
+         */
+        window.setTimeout(function () { that.emit('ready'); }, 50);
+    }
+
+    // Inheritance
+    tiny.inherits(Bubble, ch.Popover);
+
+    var parent = Bubble.super_.prototype;
+
+    /**
+     * The name of the component.
+     * @memberof! ch.Bubble.prototype
+     * @type {String}
+     */
+    Bubble.prototype.name = 'bubble';
+
+    /**
+     * Returns a reference to the constructor function.
+     * @memberof! ch.Bubble.prototype
+     * @function
+     */
+    Bubble.prototype.constructor = Bubble;
+
+    /**
+     * Configuration by default.
+     * @memberof! ch.Bubble.prototype
+     * @type {Object}
+     * @private
+     */
+    Bubble.prototype._defaults = tiny.extend(tiny.clone(parent._defaults), {
+        '_className': 'ch-bubble ch-box-icon ch-box-error ch-cone',
+        '_ariaRole': 'alert',
+        'shownby': 'none',
+        'hiddenby': 'none',
+        'side': 'right',
+        'align': 'center',
+        'offsetX': 10,
+        'content': 'Check the information, please.'
+    });
+
+    /**
+     * Initialize a new instance of Bubble and merge custom options with defaults options.
+     * @memberof! ch.Bubble.prototype
+     * @function
+     * @private
+     * @returns {bubble}
+     */
+    Bubble.prototype._init = function (el, options) {
+        // Call to its parent init method
+        parent._init.call(this, el, options);
+
+        this.container.insertAdjacentHTML('beforeend', '<i class="ch-icon-remove-sign"></i>');
+
+        return this;
+    };
+
+    ch.factory(Bubble, parent._normalizeOptions);
 
 }(this, this.ch));
 
@@ -3447,6 +5099,1437 @@
     'use strict';
 
     /**
+     * Zoom shows a contextual reference to an augmented version of a declared image.
+     * @memberof ch
+     * @constructor
+     * @augments ch.Layer
+     * @param {String} selector A CSS Selector to create an instance of ch.Zoom.
+     * @param {Object} [options] Options to customize an instance.
+     * @param {String} [options.addClass] CSS class names that will be added to the container on the component initialization.
+     * @param {String} [options.fx] Enable or disable UI effects. You must use: "slideDown", "fadeIn" or "none". Default: "none".
+     * @param {String} [options.width] Set a width for the container. Default: "300px".
+     * @param {String} [options.height] Set a height for the container. Default: "300px".
+     * @param {String} [options.shownby] Determines how to interact with the trigger to show the container. You must use: "pointertap", "pointerenter" or "none". Default: "pointerenter".
+     * @param {String} [options.hiddenby] Determines how to hide the component. You must use: "button", "pointers", "pointerleave", "all" or "none". Default: "pointerleave".
+     * @param {String} [options.reference] It's a CSS Selector reference to position and size of element that will be considered to carry out the position. Default: the trigger element.
+     * @param {String} [options.side] The side option where the target element will be positioned. Its value can be: "left", "right", "top", "bottom" or "center". Default: "right".
+     * @param {String} [options.align] The align options where the target element will be positioned. Its value can be: "left", "right", "top", "bottom" or "center". Default: "top".
+     * @param {Number} [options.offsetX] Distance to displace the target horizontally. Default: 20.
+     * @param {Number} [options.offsetY] Distance to displace the target vertically. Default: 0.
+     * @param {String} [options.position] The type of positioning used. Its value must be "absolute" or "fixed". Default: "absolute".
+     * @param {String} [options.method] The type of request ("POST" or "GET") to load content by ajax. Default: "GET".
+     * @param {String} [options.params] Params like query string to be sent to the server.
+     * @param {Boolean} [options.cache] Force to cache the request by the browser. Default: true.
+     * @param {Boolean} [options.async] Force to sent request asynchronously. Default: true.
+     * @param {(String | HTMLElement)} [options.waiting] Temporary content to use while the ajax request is loading. Default: 'Loading zoom...'.
+     * @param {(HTMLElement | String)} [options.content] The content to be shown into the Zoom container.
+     * @returns {zoom} Returns a new instance of Zoom.
+     * @example
+     * // Create a new Zoom.
+     * var zoom = new ch.Zoom([selector], [options]);
+     * @example
+     * // Create a new Zoom with a defined width (half of the screen).
+     * var zoom = new ch.Zoom({
+     *     'width': (ch.viewport.width / 2) + 'px'
+     * });
+     */
+    function Zoom(selector, options) {
+        /**
+         * Reference to context of an instance.
+         * @type {Object}
+         * @private
+         */
+        var that = this;
+
+        this._init(selector, options);
+
+        if (this.initialize !== undefined) {
+            /**
+             * If you define an initialize method, it will be executed when a new Zoom is created.
+             * @memberof! ch.Zoom.prototype
+             * @function
+             */
+            this.initialize();
+        }
+
+        /**
+         * Event emitted when the component is ready to use.
+         * @event ch.Zoom#ready
+         * @example
+         * // Subscribe to "ready" event.
+         * zoom.on('ready', function () {
+         *     // Some code here!
+         * });
+         */
+        window.setTimeout(function () { that.emit('ready'); }, 50);
+    }
+
+    // Inheritance
+    tiny.inherits(Zoom, ch.Layer);
+
+    var parent = Zoom.super_.prototype;
+
+    /**
+     * The name of the component.
+     * @memberof! ch.Zoom.prototype
+     * @type {String}
+     */
+    Zoom.prototype.name = 'zoom';
+
+    /**
+     * Returns a reference to the constructor function.
+     * @memberof! ch.Zoom.prototype
+     * @function
+     */
+    Zoom.prototype.constructor = Zoom;
+
+    /**
+     * Configuration by default.
+     * @memberof! ch.Zoom.prototype
+     * @type {Object}
+     * @private
+     */
+    Zoom.prototype._defaults = tiny.extend(tiny.clone(parent._defaults), {
+        '_className': 'ch-zoom',
+        '_ariaRole': 'tooltip',
+        '_hideDelay': 0,
+        'fx': 'none',
+        'width': '300px',
+        'height': '300px',
+        'side': 'right',
+        'align': 'top',
+        'offsetX': 20,
+        'offsetY': 0,
+        'waiting': 'Loading zoom...'
+    });
+
+    /**
+     * Initialize a new instance of Zoom and merge custom options with defaults options.
+     * @memberof! ch.Zoom.prototype
+     * @function
+     * @private
+     * @returns {zoom}
+     */
+    Zoom.prototype._init = function (selector, options) {
+        // Call to its parent init method
+        parent._init.call(this, selector, options);
+
+        /**
+         * Reference to context of an instance.
+         * @type {Object}
+         * @private
+         */
+        var that = this;
+
+        /**
+         * Flag to control when zoomed image is loaded.
+         * @type {Boolean}
+         * @private
+         */
+        this._loaded = false;
+
+        /**
+         * Feedback showed before the zoomed image is load. It's a transition message and its content can be configured through parameter "waiting".
+         * @type {HTMLElement}
+         * @private
+         * @example
+         * // Changing the loading feedback.
+         * var zoom = new ch.Zoom({
+         *     'waiting': 'My custom message'
+         * });
+         */
+        this._loading = (function() {
+            var dummyElement = document.createElement('div');
+            dummyElement.innerHTML = '<div class="ch-zoom-loading ch-hide"><div class="ch-loading-large"></div><p>' + that._options.waiting + '</p></div>';
+
+            return dummyElement.firstChild;
+        }());
+
+        this.trigger.appendChild(this._loading);
+
+
+        /**
+         * HTML Element shape with visual feedback to the relative size of the zoomed area.
+         * @type {HTMLDivElement}
+         * @private
+         */
+        this._seeker = (function (){
+            var dummyElement = document.createElement('div');
+            dummyElement.innerHTML = '<div class="ch-zoom-seeker ch-hide"></div>';
+
+            return dummyElement.firstChild;
+        }());
+
+        this.trigger.appendChild(this._seeker);
+
+        /**
+         * The main specified image with original size (not zoomed).
+         * @type {HTMLElement}
+         * @private
+         */
+        this._original = this.trigger.children[0];
+
+        /**
+         * The zoomed image specified as a link href (see the HTML snippet).
+         * @type {HTMLImageElement}
+         * @private
+         */
+        // Use a new Image to calculate the
+        // size before append the image to DOM, in ALL the browsers.
+        this._zoomed = new window.Image();
+
+        // Assign event handlers to the original image
+        onImagesLoads(this._original, function () {
+            that._originalLoaded();
+        });
+
+        // Assign event handlers to the zoomed image
+        onImagesLoads(this._zoomed, function () {
+            that._zoomedLoaded();
+        });
+
+        // Make the entire Show process if it tried to show before
+        this.on('imageload', function () {
+            if (!tiny.hasClass(this._loading, 'ch-hide')) {
+                that.show();
+                tiny.addClass(this._loading, 'ch-hide');
+            }
+        });
+
+        // Assign event handlers to the anchor
+        tiny.addClass(this.trigger, 'ch-zoom-trigger');
+
+        // Prevent to redirect to the href
+        tiny.on(this.trigger, 'click', function (event) { event.preventDefault(); }, false);
+
+        // Bind move calculations
+        tiny.on(this.trigger, ch.onpointermove, function (event) { that._move(event); }, false);
+
+        return this;
+    };
+
+    /**
+     * Sets the correct size to the wrapper anchor.
+     * @memberof! ch.Zoom.prototype
+     * @function
+     * @private
+     */
+    Zoom.prototype._originalLoaded = function () {
+
+        var width = this._original.width,
+            height = this._original.height,
+            offset = tiny.offset(this._el);
+
+        // Set the wrapper anchor size (same as image)
+        this.trigger.style.width = width + 'px';
+        this.trigger.style.height = height + 'px';
+
+        // Loading position centered into the anchor
+        this._loading.style.display = 'block';
+        this._loading.style.left = (width - this._loading.clientWidth) / 2 + 'px',
+        this._loading.style.top = (height - this._loading.clientHeight) / 2 + 'px';
+        this._loading.style.display = '';
+
+        /**
+         * Width of the original specified image.
+         * @type {Number}
+         * @private
+         */
+        this._originalWidth = width;
+
+        /**
+         * Height of the original specified image.
+         * @type {Number}
+         * @private
+         */
+        this._originalHeight = height;
+
+        /**
+         * Left position of the original specified anchor/image.
+         * @type {Number}
+         * @private
+         */
+        this._originalOffsetLeft = offset.left;
+
+        /**
+         * Top position of the original specified anchor/image.
+         * @type {Number}
+         * @private
+         */
+        this._originalOffsetTop = offset.top;
+    };
+
+    /**
+     * Loads the Zoom content and sets the Seeker size.
+     * @memberof! ch.Zoom.prototype
+     * @function
+     * @private
+     */
+    Zoom.prototype._zoomedLoaded = function () {
+
+        /**
+         * Relation between the zoomed and the original image width.
+         * @type {Number}
+         * @private
+         */
+        this._ratioX = (this._zoomed.width / this._originalWidth);
+
+        /**
+         * Relation between the zoomed and the original image height.
+         * @type {Number}
+         * @private
+         */
+        this._ratioY = (this._zoomed.height / this._originalHeight);
+
+        /**
+         * Width of the Seeker, calculated from ratio.
+         * @type {Number}
+         * @private
+         */
+        this._seekerWidth = window.Math.floor(window.parseInt(this._options.width, 10) / this._ratioX);
+
+        /**
+         * Height of the Seeker, calculated from ratio.
+         * @type {Number}
+         * @private
+         */
+        this._seekerHeight = window.Math.floor(window.parseInt(this._options.height, 10) / this._ratioY);
+
+        /**
+         * Half of the width of the Seeker. Used to position it.
+         * @type {Number}
+         * @private
+         */
+        this._seekerHalfWidth = window.Math.floor(this._seekerWidth / 2);
+
+        /**
+         * Half of the height of the Seeker. Used to position it.
+         * @type {Number}
+         * @private
+         */
+        this._seekerHalfHeight = window.Math.floor(this._seekerHeight / 2);
+
+        // Set size of the Seeker
+        this._seeker.style.cssText = 'width:' + this._seekerWidth + 'px;height:' + this._seekerHeight + 'px';
+
+        // Use the zoomed image as content for the floated element
+        this.content(this._zoomed);
+
+        // Update the flag to allow to zoom
+        this._loaded = true;
+
+        /**
+         * Event emitted when the zoomed image is downloaded.
+         * @event ch.Zoom#imageload
+         * @example
+         * // Subscribe to "imageload" event.
+         * zoom.on('imageload', function () {
+         *     alert('Zoomed image ready!');
+         * });
+         */
+        this.emit('imageload');
+    };
+
+    /**
+     * Calculates movement limits and sets it to Seeker and zoomed image.
+     * @memberof! ch.Zoom.prototype
+     * @function
+     * @private
+     * @param {Event} event Used to take the cursor position.
+     */
+    Zoom.prototype._move = function (event) {
+        // Don't execute when it's disabled or it's not loaded
+        if (!this._enabled || !this._loaded) {
+            return;
+        }
+
+        // By defining these variables in here, it avoids to make
+        // the substraction twice if it's a free movement
+        var pageX = (event.pageX || event.clientX + document.documentElement.scrollLeft),
+            pageY = (event.pageY || event.clientY + document.documentElement.scrollTop),
+            seekerLeft = pageX - this._seekerHalfWidth,
+            seekerTop = pageY - this._seekerHalfHeight,
+            x,
+            y;
+
+        // Left side of seeker LESS THAN left side of image
+        if (seekerLeft <= this._originalOffsetLeft) {
+            x = 0;
+        // Right side of seeker GREATER THAN right side of image
+        } else if (pageX + this._seekerHalfWidth > this._originalWidth + this._originalOffsetLeft) {
+            x = this._originalWidth - this._seekerWidth - 2;
+        // Free move
+        } else {
+            x = seekerLeft - this._originalOffsetLeft;
+        }
+
+        // Top side of seeker LESS THAN top side of image
+        if (seekerTop <= this._originalOffsetTop) {
+            y = 0;
+        // Bottom side of seeker GREATER THAN bottom side of image
+        } else if (pageY + this._seekerHalfHeight > this._originalHeight + this._originalOffsetTop) {
+            y = this._originalHeight - this._seekerHeight - 2;
+        // Free move
+        } else {
+            y = seekerTop - this._originalOffsetTop;
+        }
+
+        // Move seeker and the zoomed image
+        this._seeker.style.left = x + 'px';
+        this._seeker.style.top = y + 'px';
+        this._zoomed.style.cssText = 'left:' + (-this._ratioX * x) + 'px;top:' + (-this._ratioY * y) + 'px';
+    };
+
+    /**
+     * Shows the zoom container and the Seeker, or show a loading feedback until the zoomed image loads.
+     * @memberof! ch.Zoom.prototype
+     * @function
+     * @param {(String | HTMLElement)} [content] The content that will be used by dropdown.
+     * @param {Object} [options] A custom options to be used with content loaded by ajax.
+     * @param {String} [options.method] The type of request ("POST" or "GET") to load content by ajax. Default: "GET".
+     * @param {String} [options.params] Params like query string to be sent to the server.
+     * @param {Boolean} [options.cache] Force to cache the request by the browser. Default: true.
+     * @param {Boolean} [options.async] Force to sent request asynchronously. Default: true.
+     * @param {(String | HTMLElement)} [options.waiting] Temporary content to use while the ajax request is loading.
+     * @returns {zoom}
+     * @example
+     * // Shows a basic zoom.
+     * zoom.show();
+     * @example
+     * // Shows a zoom with new content
+     * zoom.show('Some new content here!');
+     * @example
+     * // Shows a zoom with a new content that will be loaded by ajax with some custom options
+     * zoom.show('http://domain.com/ajax/url', {
+     *     'cache': false,
+     *     'params': 'x-request=true'
+     * });
+     */
+    Zoom.prototype.show = function (content, options) {
+        // Don't execute when it's disabled
+        if (!this._enabled || this._shown) {
+            return this;
+        }
+
+        // Show feedback and trigger the image load, if it's not loaded
+        if (!this._loaded) {
+            tiny.removeClass(this._loading, 'ch-hide');
+            this.loadImage();
+            return this;
+        }
+
+        // Delete the Loading and show the Seeker
+        tiny.removeClass(this._seeker, 'ch-hide');
+
+        // Execute the original show()
+        parent.show.call(this, content, options);
+
+        return this;
+    };
+
+    /**
+     * Hides the zoom container and the Seeker.
+     * @memberof! ch.Zoom.prototype
+     * @function
+     * @returns {zoom}
+     * @example
+     * // Close a zoom
+     * zoom.hide();
+     */
+    Zoom.prototype.hide = function () {
+        if (!this._shown) {
+            return this;
+        }
+
+        // Avoid unnecessary execution
+        if (!this._loaded) {
+            tiny.addClass(this._loading, 'ch-hide');
+            return this;
+        }
+
+        tiny.addClass(this._seeker, 'ch-hide');
+
+        parent.hide.call(this);
+
+        return this;
+    };
+
+    /**
+     * Adds the zoomed image source to the <img> tag to trigger the request.
+     * @memberof! ch.Zoom.prototype
+     * @function
+     * @returns {zoom}
+     * @example
+     * // Load the zoomed image on demand.
+     * component.loadImage();
+     */
+    Zoom.prototype.loadImage = function () {
+
+        this._zoomed.src = this._el.href;
+
+        return this;
+    };
+
+    /**
+     * Destroys a Zoom instance.
+     * @memberof! ch.Zoom.prototype
+     * @function
+     * @returns {zoom}
+     * @example
+     * // Destroy a zoom
+     * zoom.destroy();
+     * // Empty the zoom reference
+     * zoom = undefined;
+     */
+    Zoom.prototype.destroy = function () {
+        var parentElement;
+
+        parentElement = tiny.parent(this._seeker);
+        parentElement.removeChild(this._seeker);
+
+        parent.destroy.call(this);
+
+        return;
+    };
+
+    ch.factory(Zoom, parent._normalizeOptions);
+
+
+    /**
+     * Executes a callback function when the images of a query selection loads.
+     * @private
+     * @param {HTMLImageElement} image An image or a collection of images.
+     * @param {Function} [callback] The handler the component will fire after the images loads.
+     *
+     * @example
+     * onImagesLoads(HTMLImageElement, function () {
+     *     console.log('The size of the loaded image is ' + this.width);
+     * });
+     */
+    function onImagesLoads(image, callback) {
+        var images;
+
+        if (Array.isArray(image)) {
+            images = image;
+        } else {
+            images = [image];
+        }
+
+        images.forEach(function (image) {
+            tiny.on(image, 'load', function onImgLoad() {
+                var len = images.length;
+
+                window.setTimeout(function () {
+                    if (--len <= 0) {
+                        callback.call(image);
+                    }
+                }, 200);
+
+                image.removeEventListener('load', onImgLoad);
+            }, false);
+
+            if (image.complete || image.complete === undefined) {
+                var src = image.src;
+                // Data uri fix bug in web-kit browsers
+                image.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
+                image.src = src;
+            }
+        });
+    }
+
+}(this, this.ch));
+
+(function (window, ch) {
+    'use strict';
+
+    function normalizeOptions(options) {
+        if (typeof options === 'string' || Array.isArray(options)) {
+            options = {
+                'selected': options
+            };
+        }
+        return options;
+    }
+
+    /**
+     * It lets you move across the months of the year and allow to set dates as selected.
+     * @memberof ch
+     * @constructor
+     * @augments ch.Component
+     * @param {HTMLElement} el A HTMLElement to create an instance of ch.Calendar.
+     * @param {Object} [options] Options to customize an instance.
+     * @param {String} [options.format] Sets the date format. You must use "DD/MM/YYYY", "MM/DD/YYYY" or "YYYY/MM/DD". Default: "DD/MM/YYYY".
+     * @param {String} [options.selected] Sets a date that should be selected by default. Default: The date of today.
+     * @param {String} [options.from] Set a minimum selectable date. The format of the given date should be YYYY/MM/DD.
+     * @param {String} [options.to] Set a maximum selectable date. The format of the given date should be YYYY/MM/DD.
+     * @param {Array} [options.monthsNames] A collection of months names. Default: ["Enero", ... , "Diciembre"].
+     * @param {Array} [options.weekdays] A collection of weekdays. Default: ["Dom", ... , "Sab"].
+     * @returns {calendar} Returns a new instance of Calendar.
+     * @example
+     * // Create a new Calendar.
+     * var calendar = new ch.Calendar([el], [options]);
+     * @example
+     * // Creates a new Calendar with custom options.
+     * var calendar =  new ch.Calendar({
+     *     'format': 'MM/DD/YYYY',
+     *     'selected': '2011/12/25',
+     *     'from': '2010/12/25',
+     *     'to': '2012/12/25',
+     *     'monthsNames': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+     *     'weekdays': ['Su', 'Mo', 'Tu', 'We', 'Thu', 'Fr', 'Sa']
+     * });
+     * @example
+     * // Creates a new Calendar using a shorthand way (selected date as parameter).
+     * var calendar = new ch.Calendar('2011/12/25');
+     */
+    function Calendar(el, options) {
+        /**
+         * Reference to context of an instance.
+         * @type {Object}
+         * @private
+         */
+        var that = this;
+
+        this._init(el, options);
+
+        if (this.initialize !== undefined) {
+            /**
+             * If you define an initialize method, it will be executed when a new Calendar is created.
+             * @memberof! ch.Calendar.prototype
+             * @function
+             */
+            this.initialize();
+        }
+
+        /**
+         * Event emitted when the component is ready to use.
+         * @event ch.Calendar#ready
+         * @example
+         * // Subscribe to "ready" event.
+         * calendar.on('ready', function () {
+         *     // Some code here!
+         * });
+         */
+        window.setTimeout(function () { that.emit('ready'); }, 50);
+    }
+
+    // Inheritance
+    tiny.inherits(Calendar, ch.Component);
+
+    /**
+     * Completes with zero the numbers less than 10.
+     * @function
+     * @private
+     * @returns {String}
+     */
+    var addZero = function (num) {
+            return (parseInt(num, 10) < 10) ? '0' + num : num;
+        },
+
+        /**
+         * Map of date formats.
+         * @type {Object}
+         * @private
+         */
+        FORMAT_dates = {
+
+            /**
+             * Converts a given date to "YYYY/MM/DD" format.
+             * @params {Date} date A given date to convert.
+             * @function
+             * @returns {String}
+             */
+            'YYYY/MM/DD': function (date) {
+                return [date.year, addZero(date.month), addZero(date.day)].join('/');
+            },
+
+            /**
+             * Converts a given date to "DD/MM/YYYY" format.
+             * @params {Date} date A given date to convert.
+             * @function
+             * @returns {String}
+             */
+            'DD/MM/YYYY': function (date) {
+                return [addZero(date.day), addZero(date.month), date.year].join('/');
+            },
+
+            /**
+             * Converts a given date to "MM/DD/YYYY" format.
+             * @params {Date} date A given date to convert.
+             * @function
+             * @returns {String}
+             */
+            'MM/DD/YYYY': function (date) {
+                return [addZero(date.month), addZero(date.day), date.year].join('/');
+            }
+        },
+
+        /**
+         * Creates a JSON Object with reference to day, month and year, from a determinated date.
+         * @function
+         * @private
+         * @returns {Object}
+         */
+        createDateObject = function (date) {
+
+            // Uses date parameter or create a date from today
+            date = (date === 'today') ? new Date() : new Date(date);
+
+            /**
+             * Returned custom Date object.
+             * @type {Object}
+             * @private
+             */
+            return {
+
+                /**
+                 * Reference to native Date object.
+                 * @type {Date}
+                 * @private
+                 */
+                'native': date,
+
+                /**
+                 * Number of day.
+                 * @type {Number}
+                 * @private
+                 */
+                'day': date.getDate(),
+
+                /**
+                 * Order of day in a week.
+                 * @type {Number}
+                 * @private
+                 */
+                'order': date.getDay(),
+
+                /**
+                 * Number of month.
+                 * @type {Number}
+                 * @private
+                 */
+                'month': date.getMonth() + 1,
+
+                /**
+                 * Number of full year.
+                 * @type {Number}
+                 * @private
+                 */
+                'year': date.getFullYear()
+            };
+        },
+
+        parent = Calendar.super_.prototype;
+
+    /**
+     * The name of the component.
+     * @memberof! ch.Calendar.prototype
+     * @type {String}
+     */
+    Calendar.prototype.name = 'calendar';
+
+    /**
+     * Returns a reference to the constructor function.
+     * @memberof! ch.Calendar.prototype
+     * @function
+     */
+    Calendar.prototype.constructor = Calendar;
+
+    /**
+     * Configuration by default.
+     * @type {Object}
+     * @private
+     */
+    Calendar.prototype._defaults = {
+        'monthsNames': ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+        'weekdays': ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'],
+        'format': 'DD/MM/YYYY'
+    };
+
+    /**
+     * Initialize a new instance of Calendar and merge custom options with defaults options.
+     * @memberof! ch.Calendar.prototype
+     * @function
+     * @private
+     * @returns {calendar}
+     */
+    Calendar.prototype._init = function (el, options) {
+        // Call to its parent init method
+        parent._init.call(this, el, options);
+
+        /**
+         * Reference to context of an instance.
+         * @type {Object}
+         * @private
+         */
+        var that = this;
+
+        // cloneNode(true) > parameters is required. Opera & IE throws and internal error. Opera mobile breaks.
+        this._snippet = this._el.cloneNode(true);
+
+        /**
+         * Object to mange the date and its ranges.
+         * @type {Object}
+         * @private
+         */
+        this._dates = {
+            'range': {}
+        };
+
+        this._dates.today = createDateObject('today');
+
+        this._dates.current = this._dates.today;
+
+        /**
+         * Date of selected day.
+         * @type {Object}
+         * @private
+         */
+        this._dates.selected = (function () {
+
+            // Get date from configuration or input value, if configured could be an Array with multiple selections
+            var selected = that._options.selected;
+
+            // Do it only if there are a "selected" parameter
+            if (!selected) { return selected; }
+
+            // Simple date selection
+            if (!Array.isArray(selected)) {
+
+                if (selected !== 'today') {
+                    // Return date object and update currentDate
+                    selected = that._dates.current = createDateObject(selected);
+
+                } else {
+                    selected = that._dates.today;
+                }
+
+            // Multiple date selection
+            } else {
+                selected.forEach(function (e, i){
+                    // Simple date
+                    if (!Array.isArray(e)) {
+                        selected[i] = (selected[i] !== 'today') ? createDateObject(e) : that._dates.today;
+                    // Range
+                    } else {
+                        selected[i][0] = (selected[i][0] !== 'today') ? createDateObject(e[0]) : that._dates.today;
+                        selected[i][1] = (selected[i][1] !== 'today') ? createDateObject(e[1]) : that._dates.today;
+                    }
+                });
+            }
+
+            return selected;
+        }());
+
+        // Today's date object
+        this._dates.today = createDateObject('today');
+
+        // Minimum selectable date
+        this._dates.range.from = (function () {
+
+            // Only works when there are a "from" parameter on configuration
+            if (that._options.from === undefined || !that._options.from) { return; }
+
+            // Return date object
+            return (that._options.from === 'today') ? that._dates.today : createDateObject(that._options.from);
+
+        }());
+
+        // Maximum selectable date
+        this._dates.range.to = (function () {
+
+            // Only works when there are a "to" parameter on configuration
+            if (that._options.to === undefined || !that._options.to) { return; }
+
+            // Return date object
+            return (that._options.to === 'today') ? that._dates.today : createDateObject(that._options.to);
+
+        }());
+
+        /**
+         * Template of previous arrow.
+         * @type {HTMLDivElement}
+         */
+        this._prev = document.createElement('div');
+        this._prev.setAttribute('aria-controls', 'ch-calendar-grid-' + this.uid);
+        this._prev.setAttribute('role', 'button');
+        this._prev.setAttribute('aria-hidden', 'false');
+        tiny.addClass(this._prev, 'ch-calendar-prev');
+
+        /**
+         * Template of next arrow.
+         * @type {HTMLDivElement}
+         */
+        this._next = document.createElement('div');
+        this._next.setAttribute('aria-controls', 'ch-calendar-grid-' + this.uid);
+        this._next.setAttribute('role', 'button');
+        this._next.setAttribute('aria-hidden', 'false');
+        tiny.addClass(this._next, 'ch-calendar-next');
+
+
+        // Show or hide arrows depending on "from" and "to" limits
+        tiny.on(this._prev, ch.onpointertap, function (event) {
+            event.preventDefault();
+            that.prevMonth();
+        });
+        tiny.on(this._next, ch.onpointertap, function (event) {
+            event.preventDefault();
+            that.nextMonth();
+        });
+
+        /**
+         * The calendar container.
+         * @type {HTMLElement}
+         */
+        this.container = this._el;
+        this.container.insertBefore(this._prev, this.container.firstChild);
+        this.container.insertBefore(this._next, this.container.firstChild);
+        tiny.addClass(this.container, 'ch-calendar');
+        this.container.insertAdjacentHTML('beforeend', this._createTemplate(this._dates.current));
+
+        this._updateControls();
+
+        // Avoid selection on the component
+        that.container.setAttribute('unselectable', 'on');
+        tiny.addClass(that.container, 'ch-user-no-select');
+
+        return this;
+    };
+
+    /**
+     * Checks if it has got a previous month to show depending on "from" limit.
+     * @function
+     * @private
+     */
+    Calendar.prototype._hasPrevMonth = function () {
+        return this._dates.range.from === undefined || !(this._dates.range.from.month >= this._dates.current.month && this._dates.range.from.year >= this._dates.current.year);
+    };
+
+    /**
+     * Checks if it has got a next month to show depending on "to" limits.
+     * @function
+     * @private
+     */
+    Calendar.prototype._hasNextMonth = function () {
+        return this._dates.range.to === undefined || !(this._dates.range.to.month <= this._dates.current.month && this._dates.range.to.year <= this._dates.current.year);
+    };
+
+    /**
+     * Refresh arrows visibility depending on "from" and "to" limits.
+     * @function
+     * @private
+     */
+    Calendar.prototype._updateControls = function () {
+
+        // Show previous arrow when it's out of limit
+        if (this._hasPrevMonth()) {
+            tiny.removeClass(this._prev, 'ch-hide');
+            this._prev.setAttribute('aria-hidden', 'false');
+
+        // Hide previous arrow when it's out of limit
+        } else {
+            tiny.addClass(this._prev, 'ch-hide');
+            this._prev.setAttribute('aria-hidden', 'true');
+        }
+
+        // Show next arrow when it's out of limit
+        if (this._hasNextMonth()) {
+            tiny.removeClass(this._next, 'ch-hide');
+            this._next.setAttribute('aria-hidden', 'false');
+
+        // Hide next arrow when it's out of limit
+        } else {
+            tiny.addClass(this._next, 'ch-hide');
+            this._next.setAttribute('aria-hidden', 'true');
+        }
+
+        return this;
+    };
+
+    /**
+     * Refresh the structure of Calendar's table with a new date.
+     * @function
+     * @private
+     */
+    Calendar.prototype._updateTemplate = function (date) {
+        var month;
+
+        // Update "currentDate" object
+        this._dates.current = (typeof date === 'string') ? createDateObject(date) : date;
+
+        // Delete old table
+        month = this.container.querySelector('table');
+        this.container.removeChild(month);
+
+        // Append new table to content
+        this.container.insertAdjacentHTML('beforeend', this._createTemplate(this._dates.current));
+
+        // Refresh arrows
+        this._updateControls();
+
+        return this;
+    };
+
+    /**
+     * Creates a complete month in a table.
+     * @function
+     * @private
+     */
+    Calendar.prototype._createTemplate = function (date) {
+
+        /**
+         * Reference to context of an instance.
+         * @type {Object}
+         * @private
+         */
+        var that = this,
+            cell,
+            positive,
+            day,
+            isSelected,
+            thead = (function () {
+
+                // Create thead structure
+                var t = ['<thead><tr role="row">'],
+                    dayIndex;
+
+                // Add week names
+                for (dayIndex = 0; dayIndex < 7; dayIndex += 1) {
+                    t.push('<th role="columnheader">' + that._defaults.weekdays[dayIndex] + '</th>');
+                }
+
+                // Close thead structure
+                t.push('</tr></thead>');
+
+                // Join structure and return
+                return t.join('');
+
+            }()),
+
+            table = [
+                '<table class="ch-calendar-month" role="grid" id="ch-calendar-grid-' + that.uid + '">',
+                '<caption>' + that._defaults.monthsNames[date.month - 1] + ' - ' + date.year + '</caption>',
+                thead
+            ],
+
+            // Total amount of days into month
+            cells = (function () {
+
+                // Amount of days of current month
+                var currentMonth = new Date(date.year, date.month, 0).getDate(),
+
+                // Amount of days of previous month
+                    prevMonth = new Date([date.year, date.month, '01'].join('/')).getDay(),
+
+                // Merge amount of previous and current month
+                    subtotal = prevMonth + currentMonth,
+
+                // Amount of days into last week of month
+                    latest = subtotal % 7,
+
+                // Amount of days of next month
+                    nextMonth = (latest > 0) ? 7 - latest : 0;
+
+                return {
+                    'previous': prevMonth,
+                    'subtotal': subtotal,
+                    'total': subtotal + nextMonth
+                };
+
+            }());
+
+        table.push('<tbody><tr class="ch-calendar-week" role="row">');
+
+        // Iteration of weekdays
+        for (cell = 0; cell < cells.total; cell += 1) {
+
+            // Push an empty cell on previous and next month
+            if (cell < cells.previous || cell > cells.subtotal - 1) {
+                table.push('<td role="gridcell" class="ch-calendar-other">X</td>');
+            } else {
+
+                // Positive number of iteration
+                positive = cell + 1;
+
+                // Day number
+                day = positive - cells.previous;
+
+                // Define if it's the day selected
+                isSelected = this._isSelected(date.year, date.month, day);
+
+                // Create cell
+                table.push(
+                    // Open cell structure including WAI-ARIA and classnames space opening
+                    '<td role="gridcell"' + (isSelected ? ' aria-selected="true"' : '') + ' class="ch-calendar-day',
+
+                    // Add Today classname if it's necesary
+                    (date.year === that._dates.today.year && date.month === that._dates.today.month && day === that._dates.today.day) ? ' ch-calendar-today' : null,
+
+                    // Add Selected classname if it's necesary
+                    (isSelected ? ' ch-calendar-selected ' : null),
+
+                    // From/to range. Disabling cells
+                    (
+                        // Disable cell if it's out of FROM range
+                        (that._dates.range.from && day < that._dates.range.from.day && date.month === that._dates.range.from.month && date.year === that._dates.range.from.year) ||
+
+                        // Disable cell if it's out of TO range
+                        (that._dates.range.to && day > that._dates.range.to.day && date.month === that._dates.range.to.month && date.year === that._dates.range.to.year)
+
+                    ) ? ' ch-calendar-disabled' : null,
+
+                    // Close classnames attribute and print content closing cell structure
+                    '">' + day + '</td>'
+                );
+
+                // Cut week if there are seven days
+                if (positive % 7 === 0) {
+                    table.push('</tr><tr class="ch-calendar-week" role="row">');
+                }
+
+            }
+
+        }
+
+        table.push('</tr></tbody></table>');
+
+        // Return table object
+        return table.join('');
+
+    };
+
+    /**
+     * Checks if a given date is into 'from' and 'to' dates.
+     * @function
+     * @private
+     */
+    Calendar.prototype._isInRange = function (date) {
+        var inRangeFrom = true,
+            inRangeTo = true;
+
+        if (this._dates.range.from) {
+            inRangeFrom = (this._dates.range.from.native <= date.native);
+        }
+
+        if (this._dates.range.to) {
+            inRangeTo = (this._dates.range.to.native >= date.native);
+        }
+
+        return inRangeFrom && inRangeTo;
+    };
+
+    /**
+     * Indicates if an specific date is selected or not (including date ranges and simple dates).
+     * @function
+     * @private
+     */
+    Calendar.prototype._isSelected = function (year, month, day) {
+        var yepnope;
+
+        if (!this._dates.selected) { return; }
+
+        yepnope = false;
+
+        // Simple selection
+        if (!Array.isArray(this._dates.selected)) {
+            if (year === this._dates.selected.year && month === this._dates.selected.month && day === this._dates.selected.day) {
+                yepnope = true;
+                return yepnope;
+            }
+
+        // Multiple selection (ranges)
+        } else {
+            this._dates.selected.forEach(function (e) {
+                // Simple date
+                if (!Array.isArray(e)) {
+                    if (year === e.year && month === e.month && day === e.day) {
+                        yepnope = true;
+                        return yepnope;
+                    }
+                // Range
+                } else {
+                    if (
+                        (year >= e[0].year && month >= e[0].month && day >= e[0].day) &&
+                            (year <= e[1].year && month <= e[1].month && day <= e[1].day)
+                    ) {
+                        yepnope = true;
+                        return yepnope;
+                    }
+                }
+            });
+        }
+
+        return yepnope;
+    };
+
+    /**
+     * Selects a specific date or returns the selected date.
+     * @memberof! ch.Calendar.prototype
+     * @function
+     * @param {String} [date] A given date to select. The format of the given date should be "YYYY/MM/DD".
+     * @returns {calendar}
+     * @example
+     * // Returns the selected date.
+     * calendar.select();
+     * @example
+     * // Select a specific date.
+     * calendar.select('2014/05/28');
+     */
+    Calendar.prototype.select = function (date) {
+        // Getter
+        if (!date) {
+            if (this._dates.selected === undefined) {
+                return;
+            }
+            return FORMAT_dates[this._options.format](this._dates.selected);
+        }
+
+        // Setter
+        var newDate = createDateObject(date);
+
+
+        if (!this._isInRange(newDate)) {
+            return this;
+        }
+
+        // Update selected date
+        this._dates.selected = (date === 'today') ? this._dates.today : newDate;
+
+        // Create a new table of selected month
+        this._updateTemplate(this._dates.selected);
+
+        /**
+         * Event emitted when a date is selected.
+         * @event ch.Calendar#select
+         * @example
+         * // Subscribe to "select" event.
+         * calendar.on('select', function () {
+         *     // Some code here!
+         * });
+         */
+        this.emit('select');
+
+        return this;
+    };
+
+    /**
+     * Returns date of today
+     * @memberof! ch.Calendar.prototype
+     * @function
+     * @returns {String} The date of today
+     * @example
+     * // Get the date of today.
+     * var today = calendar.getToday();
+     */
+    Calendar.prototype.getToday = function () {
+        return FORMAT_dates[this._options.format](this._dates.today);
+    };
+
+    /**
+     * Moves to the next month.
+     * @memberof! ch.Calendar.prototype
+     * @function
+     * @returns {calendar}
+     * @example
+     * // Moves to the next month.
+     * calendar.nextMonth();
+     */
+    Calendar.prototype.nextMonth = function () {
+        if (!this._enabled || !this._hasNextMonth()) {
+            return this;
+        }
+
+        // Next year
+        if (this._dates.current.month === 12) {
+            this._dates.current.month = 0;
+            this._dates.current.year += 1;
+        }
+
+        // Create a new table of selected month
+        this._updateTemplate([this._dates.current.year, this._dates.current.month + 1, '01'].join('/'));
+
+        /**
+         * Event emitted when a next month is shown.
+         * @event ch.Calendar#nextmonth
+         * @example
+         * // Subscribe to "nextmonth" event.
+         * calendar.on('nextmonth', function () {
+         *     // Some code here!
+         * });
+         */
+        this.emit('nextmonth');
+
+        return this;
+    };
+
+    /**
+     * Move to the previous month.
+     * @memberof! ch.Calendar.prototype
+     * @function
+     * @returns {calendar}
+     * @example
+     * // Moves to the prev month.
+     * calendar.prevMonth();
+     */
+    Calendar.prototype.prevMonth = function () {
+
+        if (!this._enabled || !this._hasPrevMonth()) {
+            return this;
+        }
+
+        // Previous year
+        if (this._dates.current.month === 1) {
+            this._dates.current.month = 13;
+            this._dates.current.year -= 1;
+        }
+
+        // Create a new table to the prev month
+        this._updateTemplate([this._dates.current.year, this._dates.current.month - 1, '01'].join('/'));
+
+        /**
+         * Event emitted when a previous month is shown.
+         * @event ch.Calendar#prevmonth
+         * @example
+         * // Subscribe to "prevmonth" event.
+         * calendar.on('prevmonth', function () {
+         *     // Some code here!
+         * });
+         */
+        this.emit('prevmonth');
+
+        return this;
+    };
+
+    /**
+     * Move to the next year.
+     * @memberof! ch.Calendar.prototype
+     * @function
+     * @returns {calendar}
+     * @example
+     * // Moves to the next year.
+     * calendar.nextYear();
+     */
+    Calendar.prototype.nextYear = function () {
+
+        if (!this._enabled || !this._hasNextMonth()) {
+            return this;
+        }
+
+        // Create a new table of selected month
+        this._updateTemplate([this._dates.current.year + 1, this._dates.current.month, '01'].join('/'));
+
+        /**
+         * Event emitted when a next year is shown.
+         * @event ch.Calendar#nextyear
+         * @example
+         * // Subscribe to "nextyear" event.
+         * calendar.on('nextyear', function () {
+         *     // Some code here!
+         * });
+         */
+        this.emit('nextyear');
+
+        return this;
+    };
+
+    /**
+     * Move to the previous year.
+     * @memberof! ch.Calendar.prototype
+     * @function
+     * @returns {calendar}
+     * @example
+     * // Moves to the prev year.
+     * calendar.prevYear();
+     */
+    Calendar.prototype.prevYear = function () {
+
+        if (!this._enabled || !this._hasPrevMonth()) {
+            return this;
+        }
+
+        // Create a new table to the prev year
+        this._updateTemplate([this._dates.current.year - 1, this._dates.current.month, '01'].join('/'));
+
+        /**
+         * Event emitted when a previous year is shown.
+         * @event ch.Calendar#prevyear
+         * @example
+         * // Subscribe to "prevyear" event.
+         * calendar.on('prevyear', function () {
+         *     // Some code here!
+         * });
+         */
+        this.emit('prevyear');
+
+        return this;
+    };
+
+    /**
+     * Set a minimum selectable date.
+     * @memberof! ch.Calendar.prototype
+     * @function
+     * @param {String} date A given date to set as minimum selectable date. The format of the given date should be "YYYY/MM/DD".
+     * @returns {calendar}
+     * @example
+     * // Set a minimum selectable date.
+     * calendar.setFrom('2010/05/28');
+     */
+    Calendar.prototype.setFrom = function (date) {
+        // this from is a reference to the global form
+        this._dates.range.from = (date === 'auto') ? undefined : createDateObject(date);
+        this._updateTemplate(this._dates.current);
+
+        return this;
+    };
+
+    /**
+     * Set a maximum selectable date.
+     * @memberof! ch.Calendar.prototype
+     * @function
+     * @param {String} date A given date to set as maximum selectable date. The format of the given date should be "YYYY/MM/DD".
+     * @returns {calendar}
+     * @example
+     * // Set a maximum selectable date.
+     * calendar.setTo('2014/05/28');
+     */
+    Calendar.prototype.setTo = function (date) {
+        // this to is a reference to the global to
+        this._dates.range.to = (date === 'auto') ? undefined : createDateObject(date);
+        this._updateTemplate(this._dates.current);
+
+        return this;
+    };
+
+    /**
+     * Destroys a Calendar instance.
+     * @memberof! ch.Calendar.prototype
+     * @function
+     * @example
+     * // Destroy a calendar
+     * calendar.destroy();
+     * // Empty the calendar reference
+     * calendar = undefined;
+     */
+    Calendar.prototype.destroy = function () {
+
+        this._el.parentNode.replaceChild(this._snippet, this._el);
+
+        tiny.trigger(window.document, ch.onlayoutchange);
+
+        parent.destroy.call(this);
+
+        return;
+    };
+
+    // Factorize
+    ch.factory(Calendar, normalizeOptions);
+
+}(this, this.ch));
+
+(function (window, ch) {
+    'use strict';
+
+    /**
      * Dropdown shows a list of options for navigation.
      * @memberof ch
      * @constructor
@@ -3702,606 +6785,70 @@
 
 }(this, this.ch));
 
-(function (window, ch) {
-    'use strict';
-
-    /**
-     * Form is a controller of DOM's HTMLFormElement.
-     * @memberof ch
-     * @constructor
-     * @augments ch.Component
-     * @requires ch.Validations
-     * @param {HTMLElement} el A HTMLElement to create an instance of ch.Form.
-     * @param {Object} [options] Options to customize an instance.
-     * @param {Object} [options.messages] A collections of validations messages.
-     * @param {String} [options.messages.required] A validation message.
-     * @param {String} [options.messages.string] A validation message.
-     * @param {String} [options.messages.url] A validation message.
-     * @param {String} [options.messages.email] A validation message.
-     * @param {String} [options.messages.maxLength] A validation message.
-     * @param {String} [options.messages.minLength] A validation message.
-     * @param {String} [options.messages.custom] A validation message.
-     * @param {String} [options.messages.number] A validation message.
-     * @param {String} [options.messages.min] A validation message.
-     * @param {String} [options.messages.max] A validation message.
-     * @returns {form} Returns a new instance of Form.
-     * @example
-     * // Create a new Form.
-     * var form = new ch.Form(el, [options]);
-     * @example
-     * // Create a new Form with custom messages.
-     * var form = new ch.Form({
-     *     'messages': {
-     *          'required': 'Some message!',
-     *          'email': 'Another message!'
-     *     }
-     * });
-     */
-    function Form(el, options) {
-
-        /**
-         * Reference to context of an instance.
-         * @type {Object}
-         * @private
-         */
-        var that = this;
-
-        that._init(el, options);
-
-        if (this.initialize !== undefined) {
-            /**
-             * If you define an initialize method, it will be executed when a new Form is created.
-             * @memberof! ch.Form.prototype
-             * @function
-             */
-            this.initialize();
-        }
-
-        /**
-         * It emits an event when the form is ready to use.
-         * @event ch.Form#ready
-         * @example
-         * // Subscribe to "ready" event.
-         * form.on('ready', function () {
-         *     // Some code here!
-         * });
-         */
-        window.setTimeout(function () { that.emit('ready'); }, 50);
-    }
-
-    // Inheritance
-    tiny.inherits(Form, ch.Component);
-
-    var parent = Form.super_.prototype;
-
-    /**
-     * The name of the component.
-     * @memberof! ch.Form.prototype
-     * @type {String}
-     */
-    Form.prototype.name = 'form';
-
-    /**
-     * Returns a reference to the constructor function.
-     * @memberof! ch.Form.prototype
-     * @function
-     */
-    Form.prototype.constructor = Form;
-
-    /**
-     * Initialize a new instance of Form and merge custom options with defaults options.
-     * @memberof! ch.Form.prototype
-     * @function
-     * @private
-     * @returns {form}
-     */
-    Form.prototype._init = function (el, options) {
-        // Call to its parent init method
-        parent._init.call(this, el, options);
-
-        /**
-         * Reference to context of an instance.
-         * @type {Object}
-         * @private
-         */
-        var that = this;
-
-        /**
-         * A collection of active errors.
-         * @type {Array}
-         */
-        this.errors = [];
-
-        /**
-         * Collection of defined messages.
-         * @type {Object}
-         * @private
-         */
-        this._messages = this._options.messages || {};
-
-        /**
-         * A collection of validations instances.
-         * @type {Array}
-         */
-        this.validations = [];
-
-        /**
-         * The form container.
-         * @type {HTMLElement}
-         */
-        this.container = this._el;
-            // Add classname
-        tiny.addClass(this.container, 'ch-form');
-            // Disable HTML5 browser-native validations
-        this.container.setAttribute('novalidate', 'novalidate');
-            // Bind the submit
-        tiny.on(this.container, 'submit', function (event) {
-            // Runs validations
-            that.validate(event);
-        });
-
-        // Bind the reset
-        if (this.container.querySelector('input[type="reset"]')) {
-            tiny.on(this.container.querySelector('input[type="reset"]'), ch.onpointertap, function (event) {
-                event.preventDefault();
-                that.reset();
-            });
-        }
-        // Stub for EventEmitter to prevent the errors throwing
-        this.on('error', function(){});
-
-        // Clean validations
-        this.on('disable', this.clear);
-
-        return this;
-    };
-
-    /**
-     * Executes all validations.
-     * @memberof! ch.Form.prototype
-     * @function
-     * @returns {form}
-     */
-    Form.prototype.validate = function (event) {
-
-        if (!this._enabled) {
-            return this;
-        }
-
-        /**
-         * It emits an event when the form will be validated.
-         * @event ch.Form#beforevalidate
-         * @example
-         * // Subscribe to "beforevalidate" event.
-         * component.on('beforevalidate', function () {
-         *     // Some code here!
-         * });
-         */
-        this.emit('beforevalidate');
-
-        /**
-         * Reference to context of an instance.
-         * @type {Object}
-         * @private
-         */
-        var that = this,
-            i = 0,
-            j = that.validations.length,
-            validation,
-            firstError,
-            firstErrorVisible,
-            triggerError;
-
-        this.errors.length = 0;
-
-        // Run validations
-        for (i; i < j; i += 1) {
-            validation = that.validations[i];
-
-            // Validate
-            validation.validate();
-
-            // Store validations with errors
-            if (validation.isShown()) {
-                that.errors.push(validation);
-            }
-        }
-
-        // Is there's an error
-        if (that.errors.length > 0) {
-            firstError = that.errors[0];
-            firstErrorVisible = firstError.trigger;
-
-            // Find the closest visible parent if current element is hidden
-            while (tiny.css(firstErrorVisible, 'display') === 'none' && firstErrorVisible !== document.documentElement) {
-                firstErrorVisible = firstErrorVisible.parentElement;
-            }
-
-            firstErrorVisible.scrollIntoView();
-
-            // Issue UI-332: On validation must focus the first field with errors.
-            // Doc: http://wiki.ml.com/display/ux/Mensajes+de+error
-            triggerError = firstError.trigger;
-
-            if (triggerError.tagName === 'DIV') {
-                firstError.trigger.querySelector('input:first-child').focus();
-            }
-
-            if (triggerError.type !== 'hidden' || triggerError.tagName === 'SELECT') {
-                triggerError.focus();
-            }
-
-            if (event && event.preventDefault) {
-                event.preventDefault();
-            }
-
-            /**
-             * It emits an event when a form has got errors.
-             * @event ch.Form#error
-             * @example
-             * // Subscribe to "error" event.
-             * form.on('error', function (errors) {
-             *     console.log(errors.length);
-             * });
-             */
-            this.emit('error', this.errors);
-
-        } else {
-
-            /**
-             * It emits an event when a form hasn't got errors.
-             * @event ch.Form#success
-             * @example
-             * // Subscribe to "success" event.
-             * form.on("submit",function () {
-             *     // Some code here!
-             * });
-             * @example
-             * // Subscribe to "success" event and prevent the submit event.
-             * form.on("submit",function (event) {
-             *     event.preventDefault();
-             *     // Some code here!
-             * });
-             */
-            this.emit('success', event);
-        }
-
-        return this;
-    };
-
-    /**
-     * Checks if the form has got errors but it doesn't show bubbles.
-     * @memberof! ch.Form.prototype
-     * @function
-     * @returns {Boolean}
-     * @example
-     * // Checks if a form has errors and do something.
-     * if (form.hasError()) {
-     *     // Some code here!
-     * };
-     */
-    Form.prototype.hasError = function () {
-
-        if (!this._enabled) {
-            return false;
-        }
-
-        this.errors.length = 0;
-
-        var i = 0,
-            j = this.validations.length,
-            validation;
-
-        // Run hasError
-        for (i; i < j; i += 1) {
-
-            validation = this.validations[i];
-
-            if (validation.hasError()) {
-                this.errors.push(validation);
-            }
-
-        }
-
-        return this.errors.length > 0;
-    };
-
-    /**
-     * Clear all active errors.
-     * @memberof! ch.Form.prototype
-     * @function
-     * @returns {form}
-     * @example
-     * // Clear active errors.
-     * form.clear();
-     */
-    Form.prototype.clear = function () {
-        var i = 0,
-            j = this.validations.length;
-
-        for (i; i < j; i += 1) {
-            this.validations[i].clear();
-        }
-
-        /**
-         * It emits an event when the form is cleaned.
-         * @event ch.Form#clear
-         * @example
-         * // Subscribe to "clear" event.
-         * form.on('clear', function () {
-         *     // Some code here!
-         * });
-         */
-        this.emit('clear');
-
-        return this;
-    };
-
-    /**
-     * Clear all active errors and executes the reset() native mehtod.
-     * @memberof! ch.Form.prototype
-     * @function
-     * @returns {form}
-     * @example
-     * // Resets form fields and clears active errors.
-     * form.reset();
-     */
-    Form.prototype.reset = function () {
-
-        // Clears all shown validations
-        this.clear();
-
-        // Executes the native reset() method
-        this._el.reset();
-
-        /**
-         * It emits an event when a form resets its fields.
-         * @event ch.Form#reset
-         * @example
-         * // Subscribe to "reset" event.
-         * form.on('reset', function () {
-         *     // Some code here!
-         * });
-         */
-        this.emit('reset');
-
-        return this;
-    };
-
-    /**
-     * Destroys a Form instance.
-     * @memberof! ch.Form.prototype
-     * @function
-     * @example
-     * // Destroy a form
-     * form.destroy();
-     * // Empty the form reference
-     * form = undefined;
-     */
-    Form.prototype.destroy = function () {
-
-        // this.$container.off('.form')
-        this.container.removeAttribute('novalidate');
-
-        this.validations.forEach(function (e) {
-            e.destroy();
-        });
-
-        parent.destroy.call(this);
-
-        return;
-    };
-
-    // Factorize
-    ch.factory(Form);
-
-}(this, this.ch));
-
 (function (ch) {
     'use strict';
 
-    // Private Members
-    var conditions = {
-        'string': {
-            'fn': function (value) {
-                // the following regular expression has the utf code for the lating characters
-                // the ranges are A,EI,O,U,a,ei,o,u,ç,Ç please for reference see http://www.fileformat.info/info/charset/UTF-8/list.htm
-                return (/^([a-zA-Z\u00C0-\u00C4\u00C8-\u00CF\u00D2-\u00D6\u00D9-\u00DC\u00E0-\u00E4\u00E8-\u00EF\u00F2-\u00F6\u00E9-\u00FC\u00C7\u00E7\s]*)$/i).test(value);
-            },
-            'message': 'Use only letters.'
-        },
-        'email': {
-            'fn': function (value) {
-                return (/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/i).test(value);
-            },
-            'message': 'Use a valid e-mail such as name@example.com.'
-        },
-        'url': {
-            'fn': function (value) {
-                return (/^((https?|ftp|file):\/\/|((www|ftp)\.)|(\/|.*\/)*)[a-z0-9-]+((\.|\/)[a-z0-9-]+)+([/?].*)?$/i).test(value);
-            },
-            'message': 'It must be a valid URL.'
-        },
-        'minLength': {
-            'fn': function (a, b) { return a.length >= b; },
-            'message': 'Enter at least {#num#} characters.'
-        },
-        'maxLength': {
-            'fn': function (a, b) { return a.length <= b; },
-            'message': 'The maximum amount of characters is {#num#}.'
-        },
-        'number': {
-            'fn': function (value) {
-                return (/^(-?[0-9]+)$/i).test(value);
-            },
-            'message': 'Use only numbers.'
-        },
-        'max': {
-            'fn': function (a, b) { return a <= b; },
-            'message': 'The amount must be smaller than {#num#}.'
-        },
-        'min': {
-            'fn': function (a, b) { return a >= b; },
-            'message': 'The amount must be higher than {#num#}.'
-        },
-        'required': {
-            'fn': function (value) {
+    /**
+     * Highlights the current option when navigates by keyboard.
+     * @function
+     * @private
+     */
+    ch.Dropdown.prototype._highlightOption = function (key) {
 
-                var tag = tiny.hasClass(this.trigger, 'ch-form-options') ? 'OPTIONS' : this._el.tagName,
-                    validated;
+        var optionsLength = this._navigation.length;
 
-                switch (tag) {
-                case 'OPTIONS':
-                    validated = this.trigger.querySelectorAll('input:checked').length !== 0;
-                    break;
+        if (!this._shown) { return; }
 
-                case 'SELECT':
-                    validated = (value !== '-1' && value !== '');
-                    break;
+        // Sets limits behavior
+        if (this._selected === (key === ch.onkeydownarrow ? optionsLength - 1 : 0)) { return; }
 
-                // INPUTS and TEXTAREAS
-                default:
-                    validated = value.replace(/^\s+|\s+$/g, '').length !== 0;
-                    break;
-                }
-
-                return validated;
-            },
-            'message': 'Fill in this information.'
-        },
-        'custom': {
-            // I don't have pre-conditions, comes within conf.fn argument
-            'message': 'Error'
+        // Unselects current option
+        if (this._selected !== -1) {
+            this._navigation[this._selected].blur();
+            this._navigation[this._selected].removeAttribute('id');
         }
+
+        if (key === ch.onkeydownarrow) { this._selected += 1; } else { this._selected -= 1; }
+
+        // Selects new current option
+        this._navigation[this._selected].focus();
+        this._navigation[this._selected].id = 'ch-dropdown' + this.uid + '-selected';
     };
 
     /**
-     * Condition utility.
-     * @memberof ch
-     * @constructor
-     * @requires ch.Validation
-     * @param {Array} [condition] A conditions to validate.
-     * @param {String} [condition.name] The name of the condition.
-     * @param {String} [condition.message] The given error message to the condition.
-     * @param {String} [condition.fn] The method to validate a given condition.
-     * @returns {condition} Returns a new instance of Condition.
-     * @example
-     * // Create a new condition object with patt.
-     * var condition = ch.Condition({
-     *     'name': 'string',
-     *     'patt': /^([a-zA-Z\u00C0-\u00C4\u00C8-\u00CF\u00D2-\u00D6\u00D9-\u00DC\u00E0-\u00E4\u00E8-\u00EF\u00F2-\u00F6\u00E9-\u00FC\u00C7\u00E7\s]*)$/,
-     *     'message': 'Some message here!'
-     * });
-     * @example
-     * //Create a new condition object with expr.
-     * var condition = ch.Condition({
-     *     'name': 'maxLength',
-     *     'patt': function(a,b) { return a.length <= b },
-     *     'message': 'Some message here!',
-     *     'value': 4
-     * });
-     * @example
-     * // Create a new condition object with func.
-     * var condition = ch.Condition({
-     *     'name': 'custom',
-     *     'patt': function (value) {
-     *         if (value === 'ChicoUI') {
-     *
-     *             // Some code here!
-     *
-     *             return true;
-     *         };
-     *
-     *         return false;
-     *     },
-     *     'message': 'Your message here!'
-     * });
-     */
-    function Condition(condition) {
-
-        tiny.extend(this, conditions[condition.name], condition);
-
-        // replaces the condition default message in the following conditions max, min, minLenght, maxLenght
-        if (this.name === 'min' || this.name === 'max' || this.name === 'minLength' || this.name === 'maxLength') {
-            this.message = this.message.replace('{#num#}', this.num);
-        }
-
-        this._enabled = true;
-
-        return this;
-    }
-
-    /**
-     * The name of the component.
-     * @memberof! ch.Condition.prototype
-     * @type {String}
-     */
-    Condition.prototype.name = 'condition';
-
-    /**
-     * Returns a reference to the constructor function.
-     * @memberof! ch.Condition.prototype
+     * Add handlers to manage the keyboard on Dropdown navigation.
      * @function
+     * @private
      */
-    Condition.prototype.constructor = Condition;
+    ch.Dropdown.prototype._navigationShortcuts = function () {
+        /**
+         * Reference to context of an instance.
+         * @type {Object}
+         * @private
+         */
+        var that = this;
 
-    /**
-     * Enables an instance of condition.
-     * @memberof! ch.Condition.prototype
-     * @function
-     * @returns {condition}
-     * @example
-     * // Enabling an instance of Condition.
-     * condition.enable();
-     * @example
-     * // Enabling a condition.
-     * condition.enable();
-     */
-    Condition.prototype.enable = function () {
-        this._enabled = true;
+        ch.shortcuts.add(ch.onkeyuparrow, this.uid, function (event) {
+            // Prevent default behavior
+            event.preventDefault();
+
+            that._highlightOption(event.shortcut);
+        });
+
+        ch.shortcuts.add(ch.onkeydownarrow, this.uid, function (event) {
+            // Prevent default behavior
+            event.preventDefault();
+
+            that._highlightOption(event.shortcut);
+        });
+
+        this.once('destroy', function () {
+            ch.shortcuts.remove(ch.onkeyuparrow, that.uid);
+            ch.shortcuts.remove(ch.onkeydownarrow, that.uid);
+        });
 
         return this;
     };
-
-    /**
-     * Disables an instance of a condition.
-     * @memberof! ch.Condition.prototype
-     * @function
-     * @returns {condition}
-     * @example
-     * // Disabling an instance of Condition.
-     * condition.disable();
-     * @example
-     * // Disabling a condition.
-     * condition.disable();
-     */
-    Condition.prototype.disable = function () {
-        this._enabled = false;
-
-        return this;
-    };
-
-    /**
-     * Enables an instance of condition.
-     * @memberof! ch.Condition.prototype
-     * @function
-     * @param {(String | Number)} value A given value.
-     * @param {condition} validation A given validation to execute.
-     * @returns {Boolean} Returns a boolean indicating whether the condition fails or not.
-     * @example
-     * // Testing a condition.
-     * condition.test('foobar', validationA);
-     */
-    Condition.prototype.test = function (value, validation) {
-
-        if (!this._enabled) {
-            return true;
-        }
-
-        return this.fn.call(validation, value, this.num);
-    };
-
-    ch.Condition = Condition;
 
 }(this.ch));
 
@@ -4309,50 +6856,19 @@
     'use strict';
 
     /**
-     * Validation is an engine to validate HTML forms elements.
+     * Tabs lets you create tabs for static and dynamic content.
      * @memberof ch
      * @constructor
      * @augments ch.Component
-     * @requires ch.Condition
-     * @requires ch.Form
-     * @requires ch.Bubble
-     * @param {HTMLElement} el A HTMLElement to create an instance of ch.Validation.
+     * @requires ch.Expandable
+     * @param {HTMLElement} el A HTMLElement to create an instance of ch.Tabs.
      * @param {Object} [options] Options to customize an instance.
-     * @param {Array} [options.conditions] A collection of conditions to validate.
-     * @param {String} [options.conditions.name] The name of the condition.
-     * @param {String} [options.conditions.message] The given error message to the condition.
-     * @param {String} [options.conditions.fn] The method to validate a given condition.
-     * @param {HTMLElement} [options.reference] It's a reference to position and size of element that will be considered to carry out the position.
-     * @param {String} [options.side] The side option where the target element will be positioned. Default: "right".
-     * @param {String} [options.align] The align options where the target element will be positioned. Default: "top".
-     * @param {Number} [options.offsetX] Distance to displace the target horizontally. Default: 10.
-     * @param {Number} [options.offsetY] Distance to displace the target vertically. Default: 0.
-     * @param {String} [options.position] The type of positioning used. Default: "absolute".
-     * @returns {validation} Returns a new instance of Validation.
+     * @returns {tabs} Returns a new instance of Tabs.
      * @example
-     * // Create a new Validation.
-     * var validation = new ch.Validation(document.querySelector('.name-field'), [options]);
-     * @example
-     * // Create a validation with with custom options.
-     * var validation = new ch.Validation({
-     *     'conditions': [
-     *         {
-     *             'name': 'required',
-     *             'message': 'Please, fill in this information.'
-     *         },
-     *         {
-     *             'name': 'custom-email',
-     *             'fn': function (value) { return value === "customail@custom.com"; },
-     *             'message': 'Use a valid e-mail such as name@custom.com.'
-     *         }
-     *     ],
-     *     'offsetX': 0,
-     *     'offsetY': 10,
-     *     'side': 'bottom',
-     *     'align': 'left'
-     * });
+     * // Create a new Tabs.
+     * var tabs = new ch.Tabs(el);
      */
-    function Validation(el, options) {
+    function Tabs(el, options) {
 
         /**
          * Reference to context of an instance.
@@ -4365,52 +6881,62 @@
 
         if (this.initialize !== undefined) {
             /**
-             * If you define an initialize method, it will be executed when a new Validation is created.
-             * @memberof! ch.Validation.prototype
+             * If you define an initialize method, it will be executed when a new Tabs is created.
+             * @memberof! ch.Tabs.prototype
              * @function
              */
             this.initialize();
         }
 
         /**
-         * Event emitted when the component is ready to use.
-         * @event ch.Validation#ready
+         * Emits the event 'ready' when the component is ready to use.
+         * @event ch.Tabs#ready
          * @example
          * // Subscribe to "ready" event.
-         * validation.on('ready', function () {
-         *     // Some code here!
+         * tabs.on('ready',function () {
+         *     this.show();
          * });
          */
         window.setTimeout(function () { that.emit('ready'); }, 50);
     }
 
     // Inheritance
-    tiny.inherits(Validation, ch.Component);
+    tiny.inherits(Tabs, ch.Component);
 
-    var parent = Validation.super_.prototype,
+    // Inheritance
+    var parent = Tabs.super_.prototype,
+
+        location = window.location,
+
         // Creates methods enable and disable into the prototype.
         methods = ['enable', 'disable'],
-        len = methods.length;
+        len = methods.length,
+
+        // Regular expresion to get hash
+        hashRegExp = new RegExp('\\#!?\\/?(.[^\\?|\\&|\\s]+)');
 
     function createMethods(method) {
-        Validation.prototype[method] = function (condition) {
-            var key;
+        Tabs.prototype[method] = function (tab) {
+            var i;
 
-            // Specific condition
-            if (condition !== undefined && this.conditions[condition] !== undefined) {
+            // Enables or disables an specifc tab panel
+            if (tab !== undefined) {
+                this.tabpanels[tab - 1][method]();
 
-                this.conditions[condition][method]();
-
+            // Enables or disables Tabs
             } else {
 
-                // all conditions
-                for (key in this.conditions) {
-                    if (this.conditions[key] !== undefined) {
-                        this.conditions[key][method]();
-                    }
+                i = this.tabpanels.length;
+
+                while (i) {
+                    this.tabpanels[i -= 1][method]();
                 }
 
+                // Executes parent method
                 parent[method].call(this);
+
+                // Updates "aria-disabled" attribute
+                this._el.setAttribute('aria-disabled', !this._enabled);
             }
 
             return this;
@@ -4419,35 +6945,30 @@
 
     /**
      * The name of the component.
-     * @memberof! ch.Validation.prototype
+     * @memberof! ch.Tabs.prototype
      * @type {String}
+     * @example
+     * // You can reach the associated instance.
+     * var tabs = $(selector).data('tabs');
      */
-    Validation.prototype.name = 'validation';
+    Tabs.prototype.name = 'tabs';
 
     /**
      * Returns a reference to the constructor function.
-     * @memberof! ch.Validation.prototype
+     * @memberof! ch.Tabs.prototype
      * @function
      */
-    Validation.prototype.constructor = Validation;
+    Tabs.prototype.constructor = Tabs;
 
     /**
-     * Configuration by default.
-     * @type {Object}
-     * @private
-     */
-    Validation.prototype._defaults = {
-        'offsetX': 10
-    };
-
-    /**
-     * Initialize a new instance of Validation and merge custom options with defaults options.
-     * @memberof! ch.Validation.prototype
+     * Initialize a new instance of Tabs and merge custom options with defaults options.
+     * @memberof! ch.Tabs.prototype
      * @function
      * @private
-     * @returns {validation}
+     * @returns {tabs}
      */
-    Validation.prototype._init = function (el, options) {
+    Tabs.prototype._init = function (el, options) {
+        parent._init.call(this, el, options);
 
         /**
          * Reference to context of an instance.
@@ -4456,103 +6977,77 @@
          */
         var that = this;
 
-        parent._init.call(this, el, options);
+        /**
+        * The actual location hash, is used to know if there's a specific tab panel shwown.
+        * @type {String}
+        * @private
+        */
+        this._currentHash = (function () {
+            var hash = location.hash.match(hashRegExp);
+            return (hash !== null) ? hash[1] : '';
+        }());
+
+        // cloneNode(true) > parameters is required. Opera & IE throws and internal error. Opera mobile breaks.
+        this._snippet = this._el.cloneNode(true);
 
         /**
-         * The validation trigger.
+         * The tabs container.
          * @type {HTMLElement}
          */
-        this.trigger = this._el;
+        this.container = this._el;
+        tiny.addClass(this.container, 'ch-tabs');
 
         /**
-         * The validation container.
+         * The tabs triggers.
          * @type {HTMLElement}
          */
-        this._configureContainer();
+        this.triggers = this.container.children[0];
+        this.triggers.setAttribute('role', 'tablist');
+        tiny.addClass(this.triggers, 'ch-tabs-triggers');
 
         /**
-         * The collection of conditions.
-         * @type {Object}
+         * A collection of tab panel.
+         * @type {Array}
          */
-        this.conditions = {};
-
-        // Merge conditions
-        this._mergeConditions(options.conditions);
+        this.tabpanels = [];
 
         /**
-         * Flag that let you know if there's a validation going on.
-         * @type {Boolean}
+         * The container of tab panels.
+         * @type {HTMLElement}
+         */
+        this.panel = this.container.children[1];
+        this.panel.setAttribute('role', 'presentation');
+        tiny.addClass(this.panel, 'ch-tabs-panel');
+        tiny.addClass(this.panel, 'ch-box-lite');
+
+
+        /**
+         * The tab panel's containers.
+         * @type {HTMLElement}
          * @private
          */
-        this._shown = false;
+        this._tabsPanels = this.panel.children;
 
-        /**
-         * The current error. If the validations has not error is "null".
-         * @type {Object}
-         */
-        this.error = null;
+        // Creates tab
+        Array.prototype.forEach.call(this.triggers.getElementsByTagName('a'), function (el, index) {
+            that._createTab(index, el);
+        });
 
-        this
-            // Clean the validation if is shown;
-            .on('disable', this.clear);
+        // Set the default shown tab.
+        this._shown = 1;
 
-        this.on('error', this._handleError);
-
-        /**
-         * Reference to a Form instance. If there isn't any, the Validation instance will create one.
-         * @type {form}
-         */
-        this.form = (ch.instances[tiny.parent(that.trigger, 'form').getAttribute('data-uid')] || new ch.Form(tiny.parent(that.trigger, 'form')));
-
-        this.form.validations.push(this);
-
-        /**
-         * Set a validation event to add listeners.
-         * @private
-         */
-        this._validationEvent = (tiny.hasClass(this.trigger, 'ch-form-options') || this._el.tagName === 'SELECT' || (this._el.tagName === 'INPUT' && this._el.type === 'range')) ? 'change' : 'blur';
+        // Checks if the url has a hash to shown the associated tab.
+        this._hasHash();
 
         return this;
     };
 
     /**
-     * Merges the collection of conditions with a given conditions.
+     * Create tab panels.
      * @function
      * @private
      */
-    Validation.prototype._mergeConditions = function (conditions) {
-        var i = 0,
-            j = conditions.length;
-
-        for (i; i < j; i += 1) {
-            this.conditions[conditions[i].name] = new ch.Condition(conditions[i]);
-        }
-
-        return this;
-    };
-
-    /**
-     * Validates the value of $el.
-     * @memberof! ch.Validation.prototype
-     * @function
-     * @returns {validation}
-     */
-    Validation.prototype.validate = function () {
-
-        if (this.hasError()) {
-            this._error();
-        } else {
-            this._success();
-        }
-
-        return this;
-    };
-
-    /**
-     * If the validation has got an error executes this function.
-     * @private
-     */
-    Validation.prototype._error = function () {
+    Tabs.prototype._createTab = function (i, e) {
 
         /**
          * Reference to context of an instance.
@@ -4560,614 +7055,269 @@
          * @private
          */
         var that = this,
-            previousValue;
+            tab,
 
-        // It must happen only once.
-        tiny.on(this.trigger, this._validationEvent, function () {
+            panel = this._tabsPanels[i],
 
-            if (previousValue !== this.value || that._validationEvent === 'change' && that.isShown()) {
-                previousValue = this.value;
-                that.validate();
-            }
+            // Create Tab panel's options
+            options = {
+                '_classNameIcon': null,
+                '_classNameTrigger': 'ch-tab',
+                '_classNameContainer': 'ch-tabpanel',
+                'toggle': false
+            };
 
-            if (that.conditions.required === undefined && this.value === '') {
-                that.clear();
-            }
+        // Tab panel async configuration
+        if (panel === undefined) {
 
+            panel = document.createElement('div');
+            panel.setAttribute('id', e.href.split('#')[1]);
+
+            this.panel.appendChild(panel);
+
+            options.content = e.href;
+            options.waiting = this._options.waiting;
+            options.cache = this._options.cache;
+            options.method = this._options.method;
+        }
+
+        // Tab panel container configuration
+        options.container = panel;
+
+        // Creates new Tab panel
+        tab = new ch.Expandable(e, options);
+
+        // Creates tab's hash
+        tab._hash = e.href.split('#')[1];
+
+        // Add ARIA roles
+        tab.trigger.setAttribute('role', 'tab');
+        tab.container.setAttribute('role', 'tabpanel');
+
+        // Binds show event
+        tab.on('show', function () {
+            that._updateShown(i + 1);
         });
 
-        /**
-         * It emits an error event when a validation got an error.
-         * @event ch.Validation#error
-         *
-         * @example
-         * // Subscribe to "error" event.
-         * validation.on('error', function (errors) {
-         *     console.log(errors.length);
-         * });
-         */
-        this.emit('error', this.error);
+        // Adds tab panel to the collection
+        this.tabpanels.push(tab);
 
         return this;
     };
 
     /**
-     * Internal error handler, shows the errors when needed
-     *
-     * @param err {Object} A ch.Validation#error object that contain the error message and the error condition
+     * Checks if the url has a hash to shown the associated tab panel.
+     * @function
      * @private
      */
-    Validation.prototype._handleError = function(err) {
-        var that = this;
-
-        if (!that._previousError.condition || !that._shown) {
-            if (that._el.nodeName === 'INPUT' || that._el.nodeName === 'TEXTAREA') {
-                tiny.addClass(that.trigger, 'ch-validation-error');
-            }
-
-            that._showErrorMessage(err.message || 'Error');
-        }
-
-        if (err.condition !== that._previousError.condition) {
-            that._showErrorMessage(err.message || that.form._messages[err.condition] || 'Error');
-        }
-
-        that._shown = true;
-    };
-
-    /**
-     * If the validation hasn't got an error executes this function.
-     * @private
-     */
-    Validation.prototype._success = function () {
-
-        // Status OK (with previous error) this._previousError
-        if (this._shown || !this._enabled) {
-            // Public status OK
-            this._shown = false;
-        }
-
-        this.trigger.removeAttribute('aria-label');
-        tiny.removeClass(this.trigger, 'ch-validation-error');
-
-
-        this._hideErrorMessage();
+    Tabs.prototype._hasHash = function () {
 
         /**
-         * It emits an event when a validation hasn't got an error.
-         * @event ch.Validation#success
+         * Event emitted when a tab hide a tab panel container.
+         * @event ch.Tabs#hide
          * @example
-         * // Subscribe to "success" event.
-         * validation.on("submit",function () {
+         * // Subscribe to "hide" event.
+         * tabs.on('hide', function () {
          *     // Some code here!
          * });
          */
-        this.emit('success');
+        this.emit('hide', this._shown);
+
+        var i = 0,
+            // Shows the first tab panel if not hash or it's hash and it isn't from the current tab panel,
+            l = this.tabpanels.length;
+
+        // If hash open that tab panel
+        for (i; i < l; i += 1) {
+            if (this.tabpanels[i]._hash === this._currentHash) {
+                this._shown = i + 1;
+                break;
+            }
+        }
+
+        this.tabpanels[this._shown - 1].show();
+
+        /**
+         * Event emitted when the tabs shows a tab panel container.
+         * @event ch.Tabs#show
+         * @ignore
+         */
+        this.emit('show', this._shown);
 
         return this;
     };
 
     /**
-     * Checks if the validation has got errors but it doesn't show bubbles.
-     * @memberof! ch.Validation.prototype
+     * Shows a specific tab panel.
+     * @memberof! ch.Tabs.prototype
      * @function
-     * @returns {Boolean}
+     * @param {Number} tab - A given number of tab panel.
+     * @returns {tabs}
      * @example
-     * // Checks if a validation has errors and do something.
-     * if (validation.hasError()) {
-     *     // Some code here!
-     * };
+     * // Shows the second tab panel.
+     * tabs.show(2);
      */
-    Validation.prototype.hasError = function () {
+    Tabs.prototype.show = function (tab) {
 
-        // Pre-validation: Don't validate disabled
-        if (this.trigger.getAttribute('disabled') || !this._enabled) {
-            return false;
-        }
+        // Shows the current tab
+        this.tabpanels[tab - 1].show();
 
-        var condition,
-            required = this.conditions.required,
-            value = this._el.value;
+        return this;
+    };
 
-        // Avoid fields that aren't required when they are empty or de-activated
-        if (!required && value === '' && this._shown === false) {
-            // Has got an error? Nop
-            return false;
+    /**
+     * Updates the shown tab panel, hides the previous tab panel, changes window location and emits "show" event.
+     * @memberof! ch.Tabs.prototype
+     * @function
+     * @private
+     * @param {Number} tab - A given number of tab panel.
+     */
+    Tabs.prototype._updateShown = function (tab) {
+
+        // If tab doesn't exist or if it's shown do nothing
+        if (this._shown === tab) {
+            return this;
         }
 
         /**
-         * Stores the previous error object
+         * Event emitted when a tab hide a tab panel container.
+         * @event ch.Tabs#hide
+         * @example
+         * // Subscribe to "hide" event.
+         * tabs.on('hide', function () {
+         *     // Some code here!
+         * });
+         */
+        this.emit('hide', this._shown);
+
+        // Hides the shown tab
+        this.tabpanels[this._shown - 1].hide();
+
+        /**
+         * Get wich tab panel is shown.
+         * @name ch.Tabs#_shown
+         * @type {Number}
          * @private
          */
-        this._previousError = tiny.clone(this.error);
+        this._shown = tab;
 
-        // for each condition
-        for (condition in this.conditions) {
-
-            if (this.conditions[condition] !== undefined && !this.conditions[condition].test(value, this)) {
-                // Update the error object
-                this.error = {
-                    'condition': condition,
-                    'message': this.conditions[condition].message
-                };
-
-                // Has got an error? Yeah
-                return true;
-            }
-
-        }
-
-        // Update the error object
-        this.error = null;
-
-        // Has got an error? No
-        return false;
-    };
-
-    /**
-     * Clear active error.
-     * @memberof! ch.Validation.prototype
-     * @function
-     * @returns {validation}
-     * @example
-     * // Clear active error.
-     * validation.clear();
-     */
-    Validation.prototype.clear = function () {
-
-        this.trigger.removeAttribute('aria-label');
-        tiny.removeClass(this.trigger, 'ch-validation-error');
-
-        this.error = null;
-
-        this._hideErrorMessage();
-
-        this._shown = false;
+        // Update window location hash
+        location.hash = this._currentHash = (this._currentHash === '')
+            // If the current hash is empty, create it.
+            ? '#!/' + this.tabpanels[this._shown - 1]._hash
+            // update only the previous hash
+            : location.hash.replace(location.hash.match(hashRegExp)[1], this.tabpanels[this._shown - 1]._hash);
 
         /**
-         * It emits an event when a validation is cleaned.
-         * @event ch.Validation#clear
+         * Event emitted when the tabs shows a tab panel container.
+         * @event ch.Tabs#show
          * @example
-         * // Subscribe to "clear" event.
-         * validation.on('clear', function () {
+         * // Subscribe to "show" event.
+         * tabs.on('show', function (shownTab) {
          *     // Some code here!
          * });
          */
-        this.emit('clear');
+        this.emit('show', this._shown);
 
         return this;
     };
 
     /**
-     * Indicates if the validation is shown.
-     * @memberof! ch.Validation.prototype
+     * Returns the number of the shown tab panel.
+     * @memberof! ch.Tabs.prototype
      * @function
      * @returns {Boolean}
      * @example
-     * // Execute a function if the validation is shown.
-     * if (validation.isShown()) {
+     * if (tabs.getShown() === 1) {
      *     fn();
      * }
      */
-    Validation.prototype.isShown = function () {
+    Tabs.prototype.getShown = function () {
         return this._shown;
     };
 
     /**
-     * Sets or gets messages to specifics conditions.
-     * @memberof! ch.Validation.prototype
-     * @function
-     * @returns {(validation | String)}
+     * Allows to manage the tabs content.
+     * @param {Number} tab A given tab to change its content.
+     * @param {HTMLElement} content The content that will be used by a tabpanel.
+     * @param {Object} [options] A custom options to be used with content loaded by ajax.
+     * @param {String} [options.method] The type of request ("POST" or "GET") to load content by ajax. Default: "GET".
+     * @param {String} [options.params] Params like query string to be sent to the server.
+     * @param {Boolean} [options.cache] Force to cache the request by the browser. Default: true.
+     * @param {Boolean} [options.async] Force to sent request asynchronously. Default: true.
+     * @param {(String | HTMLElement)} [options.waiting] Temporary content to use while the ajax request is loading.
      * @example
-     * // Gets a message from a condition
-     * validation.message('required');
-     * @example
-     * // Sets a new message
-     * validation.message('required', 'New message for required validation');
+     * // Updates the content of the second tab with some string.
+     * tabs.content(2, 'http://ajax.com', {'cache': false});
      */
-    Validation.prototype.message = function (condition, message) {
-
-        if (condition === undefined) {
-            throw new Error('validation.message(condition, message): Please, a condition parameter is required.');
+    Tabs.prototype.content = function (tab, content, options) {
+        if (tab === undefined || typeof tab !== 'number') {
+            throw new window.Error('Tabs.content(tab, content, options): Expected a number of tab.');
         }
 
-        // Get a new message from a condition
-        if (message === undefined) {
-            return this.conditions[condition].message;
+        if (content === undefined) {
+            return this.tab[tab - 1].content();
         }
 
-        // Sets a new message
-        this.conditions[condition].message = message;
-
-        if (this.isShown() && this.error.condition === condition) {
-            this._showErrorMessage(message);
-        }
+        this.tabpanels[tab - 1].content(content, options);
 
         return this;
     };
 
     /**
-     * Enables an instance of validation or a specific condition.
-     * @memberof! ch.Validation.prototype
+     * Enables an instance of Tabs or a specific tab panel.
+     * @memberof! ch.Tabs.prototype
      * @name enable
      * @function
-     * @param {String} [condition] - A given number of fold to enable.
-     * @returns {validation} Returns an instance of Validation.
+     * @param {Number} [tab] - A given number of tab panel to enable.
+     * @returns {tabs} Returns an instance of Tabs.
      * @example
-     * // Enabling an instance of Validation.
-     * validation.enable();
+     * // Enabling an instance of Tabs.
+     * tabs.enable();
      * @example
-     * // Enabling the "max" condition.
-     * validation.enable('max');
+     * // Enabling the second tab panel of a tabs.
+     * tabs.enable(2);
      */
 
     /**
-     * Disables an instance of a validation or a specific condition.
-     * @memberof! ch.Validation.prototype
+     * Disables an instance of Tabs or a specific tab panel.
+     * @memberof! ch.Tabs.prototype
      * @name disable
      * @function
-     * @param {String} [condition] - A given number of fold to disable.
-     * @returns {validation} Returns an instance of Validation.
+     * @param {Number} [tab] - A given number of tab panel to disable.
+     * @returns {tabs} Returns an instance of Tabs.
      * @example
-     * // Disabling an instance of Validation.
-     * validation.disable();
+     * // Disabling an instance of Tabs.
+     * tabs.disable();
      * @example
-     * // Disabling the "email" condition.
-     * validation.disable('email');
+     * // Disabling the second tab panel.
+     * tabs.disable(2);
      */
     while (len) {
         createMethods(methods[len -= 1]);
     }
 
     /**
-     * Destroys a Validation instance.
-     * @memberof! ch.Validation.prototype
+     * Destroys a Tabs instance.
+     * @memberof! ch.Tabs.prototype
      * @function
      * @example
-     * // Destroying an instance of Validation.
-     * validation.destroy();
+     * // Destroying an instance of Tabs.
+     * tabs.destroy();
      */
-    Validation.prototype.destroy = function () {
+    Tabs.prototype.destroy = function () {
 
-        // this.$trigger.off('.validation')
-        this.trigger.removeAttribute('data-side data-align');
-
-        parent.destroy.call(this);
-
-        return;
-    };
-
-    // Factorize
-    ch.factory(Validation);
-
-}(this, this.ch));
-
-(function (ch) {
-    'use strict';
-
-    /**
-     * Creates a container to show the validation message.
-     * @memberof! ch.Validation.prototype
-     * @function
-     * @private
-     * @returns {validation}
-     */
-    ch.Validation.prototype._configureContainer = function () {
-        var parent = tiny.parent(this.trigger);
-        parent.insertAdjacentHTML('beforeend', '<div class="ch-validation-message ch-hide"></div>');
-        this._container = parent.querySelector('.ch-validation-message');
-        return this;
-    };
-
-    /**
-     * Shows the validation message.
-     * @memberof! ch.Validation.prototype
-     * @function
-     * @private
-     * @returns {validation}
-     */
-    ch.Validation.prototype._showErrorMessage = function (message) {
-        this._container.innerHTML = message;
-        tiny.removeClass(this._container, 'ch-hide');
-
-        return this;
-    };
-
-    /**
-     * Hides the validation message.
-     * @memberof! ch.Validation.prototype
-     * @function
-     * @private
-     * @returns {validation}
-     */
-    ch.Validation.prototype._hideErrorMessage = function () {
-        tiny.addClass(this._container, 'ch-hide');
-
-        return this;
-    };
-
-}(this.ch));
-
-(function (window, ch) {
-    'use strict';
-
-    function normalizeOptions(options) {
-        var num = window.parseInt(options, 10);
-
-        if (!window.isNaN(num)) {
-            options = {
-                'max': num
-            };
-        }
-
-        return options;
-    }
-
-    /**
-     * Countdown counts the maximum of characters that user can enter in a form control. Countdown could limit the possibility to continue inserting charset.
-     * @memberof ch
-     * @constructor
-     * @augments ch.Component
-     * @param {HTMLElement} el A HTMLElement to create an instance of ch.Countdown.
-     * @param {Object} [options] Options to customize an instance.
-     * @param {Number} [options.max] Number of the maximum amount of characters user can input in form control. Default: 500.
-     * @param {String} [options.plural] Message of remaining amount of characters, when it's different to 1. The variable that represents the number to be replaced, should be a hash. Default: "# characters left.".
-     * @param {String} [options.singular] Message of remaining amount of characters, when it's only 1. The variable that represents the number to be replaced, should be a hash. Default: "# character left.".
-     * @returns {countdown} Returns a new instance of Countdown.
-     * @example
-     * // Create a new Countdown.
-     * var countdown = new ch.Countdown([el], [options]);
-     * @example
-     * // Create a new Countdown with custom options.
-     * var countdown = new ch.Countdown({
-     *     'max': 250,
-     *     'plural': 'Left: # characters.',
-     *     'singular': 'Left: # character.'
-     * });
-     * @example
-     * // Create a new Countdown using the shorthand way (max as parameter).
-     * var countdown = new ch.Countdown({'max': 500});
-     */
-    function Countdown(el, options) {
-
-        /**
-         * Reference to context of an instance.
-         * @type {Object}
-         * @private
-         */
-        var that = this;
-
-        this._init(el, options);
-
-        if (this.initialize !== undefined) {
-            /**
-             * If you define an initialize method, it will be executed when a new Countdown is created.
-             * @memberof! ch.Countdown.prototype
-             * @function
-             */
-            this.initialize();
-        }
-
-        /**
-         * Event emitted when the component is ready to use.
-         * @event ch.Countdown#ready
-         * @example
-         * // Subscribe to "ready" event.
-         * countdown.on('ready', function () {
-         *     // Some code here!
-         * });
-         */
-        window.setTimeout(function () { that.emit('ready'); }, 50);
-    }
-
-    // Inheritance
-    tiny.inherits(Countdown, ch.Component);
-
-    var parent = Countdown.super_.prototype;
-
-    /**
-     * The name of the component.
-     * @memberof! ch.Countdown.prototype
-     * @type {String}
-     */
-    Countdown.prototype.name = 'countdown';
-
-    /**
-     * Returns a reference to the constructor function.
-     * @memberof! ch.Countdown.prototype
-     * @function
-     */
-    Countdown.prototype.constructor = Countdown;
-
-    /**
-     * Configuration by default.
-     * @type {Object}
-     * @private
-     */
-    Countdown.prototype._defaults = {
-        'plural': '# characters left.',
-        'singular': '# character left.',
-        'max': 500
-    };
-
-    /**
-     * Initialize a new instance of Countdown and merge custom options with defaults options.
-     * @memberof! ch.Countdown.prototype
-     * @function
-     * @private
-     * @returns {countdown}
-     */
-    Countdown.prototype._init = function (el, options) {
-        // Call to its parent init method
-        parent._init.call(this, el, options);
-
-        /**
-         * Reference to context of an instance.
-         * @type {Object}
-         * @private
-         */
-        var that = this,
-
-            /**
-             * Create the "id" attribute.
-             * @type {String}
-             * @private
-             */
-            messageID = 'ch-countdown-message-' + that.uid,
-
-           /**
-             * Singular or Plural message depending on amount of remaining characters.
-             * @type {String}
-             * @private
-             */
-            message;
-
-        /**
-         * The countdown trigger.
-         * @type {HTMLTextAreaElement}
-         * @example
-         * // Gets the countdown trigger.
-         * countdown.trigger;
-         */
-        this.trigger = this._el;
-        'keyup keypress keydown input paste cut'.split(' ')
-            .forEach(function(name) {
-                tiny.on(that.trigger, name, function () { that._count(); });
-            });
-
-        /**
-         * Amount of free characters until full the field.
-         * @type {Number}
-         * @private
-         */
-        that._remaining = that._options.max - that._contentLength();
-
-        // Update the message
-        message = ((that._remaining === 1) ? that._options.singular : that._options.plural);
-
-        /**
-         * The countdown container.
-         * @type {HTMLParagraphElement}
-         */
-        that.container = (function () {
-            var parent = tiny.parent(that._el);
-            parent.insertAdjacentHTML('beforeend', '<span class="ch-countdown ch-form-hint" id="' + messageID + '">' + message.replace('#', that._remaining) + '</span>');
-
-            return parent.querySelector('#' + messageID);
-        }());
-
-        this.on('disable', this._removeError);
-
-        return this;
-    };
-
-    /**
-     * Returns the length of value.
-     * @function
-     * @private
-     * @returns {Number}
-     */
-    Countdown.prototype._contentLength = function () {
-        return this._el.value.length;
-    };
-
-    /**
-     * Process input of data on form control and updates remaining amount of characters or limits the content length. Also, change the visible message of remaining characters.
-     * @function
-     * @private
-     * @returns {countdown}
-     */
-    Countdown.prototype._count = function () {
-
-        if (!this._enabled) {
-            return this;
-        }
-
-        var length = this._contentLength(),
-            message;
-
-        this._remaining = this._options.max - length;
-
-        // Limit Count alert the user
-        if (length <= this._options.max) {
-
-            if (this._exceeded) {
-                // Update exceeded flag
-                this._exceeded = false;
-                this._removeError();
-            }
-
-        } else if (length > this._options.max) {
-
-            /**
-             * Event emitted when the lenght of characters is exceeded.
-             * @event ch.Countdown#exceed
-             * @example
-             * // Subscribe to "exceed" event.
-             * countdown.on('exceed', function () {
-             *     // Some code here!
-             * });
-             */
-            this.emit('exceed');
-
-            // Update exceeded flag
-            this._exceeded = true;
-
-            this.trigger.setAttribute('aria-invalid', 'true');
-            tiny.addClass(this.trigger, 'ch-validation-error');
-
-            tiny.addClass(this.container, 'ch-countdown-exceeded');
-        }
-
-        // Change visible message of remaining characters
-        // Singular or Plural message depending on amount of remaining characters
-        message = (this._remaining !== 1 ? this._options.plural : this._options.singular).replace(/\#/g, this._remaining);
-
-        // Update DOM text
-        this.container.innerText  = message;
-
-        return this;
-
-    };
-
-     /**
-     * Process input of data on form control and updates remaining amount of characters or limits the content length. Also, change the visible message of remaining characters.
-     * @function
-     * @private
-     * @returns {countdown}
-     */
-    Countdown.prototype._removeError = function () {
-        tiny.removeClass(this.trigger, 'ch-validation-error');
-        this.trigger.setAttribute('aria-invalid', 'false');
-
-        tiny.removeClass(this.container, 'ch-countdown-exceeded');
-
-        return this;
-    };
-
-    /**
-     * Destroys a Countdown instance.
-     * @memberof! ch.Countdown.prototype
-     * @function
-     * @example
-     * // Destroy a countdown
-     * countdown.destroy();
-     * // Empty the countdown reference
-     * countdown = undefined;
-     */
-    Countdown.prototype.destroy = function () {
-        var parentElement = tiny.parent(this.container);
-        parentElement.removeChild(this.container);
+        this._el.parentNode.replaceChild(this._snippet, this._el);
 
         tiny.trigger(window.document, ch.onlayoutchange);
 
         parent.destroy.call(this);
-
-        return;
     };
 
-    // Factorize
-    ch.factory(Countdown, normalizeOptions);
+    /**
+     * Factory
+     */
+    ch.factory(Tabs);
 
 }(this, this.ch));
 
@@ -6198,46 +8348,44 @@
     'use strict';
 
     function normalizeOptions(options) {
-        if (typeof options === 'string' || Array.isArray(options)) {
+        var num = window.parseInt(options, 10);
+
+        if (!window.isNaN(num)) {
             options = {
-                'selected': options
+                'max': num
             };
         }
+
         return options;
     }
 
     /**
-     * It lets you move across the months of the year and allow to set dates as selected.
+     * Countdown counts the maximum of characters that user can enter in a form control. Countdown could limit the possibility to continue inserting charset.
      * @memberof ch
      * @constructor
      * @augments ch.Component
-     * @param {HTMLElement} el A HTMLElement to create an instance of ch.Calendar.
+     * @param {HTMLElement} el A HTMLElement to create an instance of ch.Countdown.
      * @param {Object} [options] Options to customize an instance.
-     * @param {String} [options.format] Sets the date format. You must use "DD/MM/YYYY", "MM/DD/YYYY" or "YYYY/MM/DD". Default: "DD/MM/YYYY".
-     * @param {String} [options.selected] Sets a date that should be selected by default. Default: The date of today.
-     * @param {String} [options.from] Set a minimum selectable date. The format of the given date should be YYYY/MM/DD.
-     * @param {String} [options.to] Set a maximum selectable date. The format of the given date should be YYYY/MM/DD.
-     * @param {Array} [options.monthsNames] A collection of months names. Default: ["Enero", ... , "Diciembre"].
-     * @param {Array} [options.weekdays] A collection of weekdays. Default: ["Dom", ... , "Sab"].
-     * @returns {calendar} Returns a new instance of Calendar.
+     * @param {Number} [options.max] Number of the maximum amount of characters user can input in form control. Default: 500.
+     * @param {String} [options.plural] Message of remaining amount of characters, when it's different to 1. The variable that represents the number to be replaced, should be a hash. Default: "# characters left.".
+     * @param {String} [options.singular] Message of remaining amount of characters, when it's only 1. The variable that represents the number to be replaced, should be a hash. Default: "# character left.".
+     * @returns {countdown} Returns a new instance of Countdown.
      * @example
-     * // Create a new Calendar.
-     * var calendar = new ch.Calendar([el], [options]);
+     * // Create a new Countdown.
+     * var countdown = new ch.Countdown([el], [options]);
      * @example
-     * // Creates a new Calendar with custom options.
-     * var calendar =  new ch.Calendar({
-     *     'format': 'MM/DD/YYYY',
-     *     'selected': '2011/12/25',
-     *     'from': '2010/12/25',
-     *     'to': '2012/12/25',
-     *     'monthsNames': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-     *     'weekdays': ['Su', 'Mo', 'Tu', 'We', 'Thu', 'Fr', 'Sa']
+     * // Create a new Countdown with custom options.
+     * var countdown = new ch.Countdown({
+     *     'max': 250,
+     *     'plural': 'Left: # characters.',
+     *     'singular': 'Left: # character.'
      * });
      * @example
-     * // Creates a new Calendar using a shorthand way (selected date as parameter).
-     * var calendar = new ch.Calendar('2011/12/25');
+     * // Create a new Countdown using the shorthand way (max as parameter).
+     * var countdown = new ch.Countdown({'max': 500});
      */
-    function Calendar(el, options) {
+    function Countdown(el, options) {
+
         /**
          * Reference to context of an instance.
          * @type {Object}
@@ -6249,8 +8397,8 @@
 
         if (this.initialize !== undefined) {
             /**
-             * If you define an initialize method, it will be executed when a new Calendar is created.
-             * @memberof! ch.Calendar.prototype
+             * If you define an initialize method, it will be executed when a new Countdown is created.
+             * @memberof! ch.Countdown.prototype
              * @function
              */
             this.initialize();
@@ -6258,10 +8406,10 @@
 
         /**
          * Event emitted when the component is ready to use.
-         * @event ch.Calendar#ready
+         * @event ch.Countdown#ready
          * @example
          * // Subscribe to "ready" event.
-         * calendar.on('ready', function () {
+         * countdown.on('ready', function () {
          *     // Some code here!
          * });
          */
@@ -6269,146 +8417,43 @@
     }
 
     // Inheritance
-    tiny.inherits(Calendar, ch.Component);
+    tiny.inherits(Countdown, ch.Component);
 
-    /**
-     * Completes with zero the numbers less than 10.
-     * @function
-     * @private
-     * @returns {String}
-     */
-    var addZero = function (num) {
-            return (parseInt(num, 10) < 10) ? '0' + num : num;
-        },
-
-        /**
-         * Map of date formats.
-         * @type {Object}
-         * @private
-         */
-        FORMAT_dates = {
-
-            /**
-             * Converts a given date to "YYYY/MM/DD" format.
-             * @params {Date} date A given date to convert.
-             * @function
-             * @returns {String}
-             */
-            'YYYY/MM/DD': function (date) {
-                return [date.year, addZero(date.month), addZero(date.day)].join('/');
-            },
-
-            /**
-             * Converts a given date to "DD/MM/YYYY" format.
-             * @params {Date} date A given date to convert.
-             * @function
-             * @returns {String}
-             */
-            'DD/MM/YYYY': function (date) {
-                return [addZero(date.day), addZero(date.month), date.year].join('/');
-            },
-
-            /**
-             * Converts a given date to "MM/DD/YYYY" format.
-             * @params {Date} date A given date to convert.
-             * @function
-             * @returns {String}
-             */
-            'MM/DD/YYYY': function (date) {
-                return [addZero(date.month), addZero(date.day), date.year].join('/');
-            }
-        },
-
-        /**
-         * Creates a JSON Object with reference to day, month and year, from a determinated date.
-         * @function
-         * @private
-         * @returns {Object}
-         */
-        createDateObject = function (date) {
-
-            // Uses date parameter or create a date from today
-            date = (date === 'today') ? new Date() : new Date(date);
-
-            /**
-             * Returned custom Date object.
-             * @type {Object}
-             * @private
-             */
-            return {
-
-                /**
-                 * Reference to native Date object.
-                 * @type {Date}
-                 * @private
-                 */
-                'native': date,
-
-                /**
-                 * Number of day.
-                 * @type {Number}
-                 * @private
-                 */
-                'day': date.getDate(),
-
-                /**
-                 * Order of day in a week.
-                 * @type {Number}
-                 * @private
-                 */
-                'order': date.getDay(),
-
-                /**
-                 * Number of month.
-                 * @type {Number}
-                 * @private
-                 */
-                'month': date.getMonth() + 1,
-
-                /**
-                 * Number of full year.
-                 * @type {Number}
-                 * @private
-                 */
-                'year': date.getFullYear()
-            };
-        },
-
-        parent = Calendar.super_.prototype;
+    var parent = Countdown.super_.prototype;
 
     /**
      * The name of the component.
-     * @memberof! ch.Calendar.prototype
+     * @memberof! ch.Countdown.prototype
      * @type {String}
      */
-    Calendar.prototype.name = 'calendar';
+    Countdown.prototype.name = 'countdown';
 
     /**
      * Returns a reference to the constructor function.
-     * @memberof! ch.Calendar.prototype
+     * @memberof! ch.Countdown.prototype
      * @function
      */
-    Calendar.prototype.constructor = Calendar;
+    Countdown.prototype.constructor = Countdown;
 
     /**
      * Configuration by default.
      * @type {Object}
      * @private
      */
-    Calendar.prototype._defaults = {
-        'monthsNames': ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-        'weekdays': ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'],
-        'format': 'DD/MM/YYYY'
+    Countdown.prototype._defaults = {
+        'plural': '# characters left.',
+        'singular': '# character left.',
+        'max': 500
     };
 
     /**
-     * Initialize a new instance of Calendar and merge custom options with defaults options.
-     * @memberof! ch.Calendar.prototype
+     * Initialize a new instance of Countdown and merge custom options with defaults options.
+     * @memberof! ch.Countdown.prototype
      * @function
      * @private
-     * @returns {calendar}
+     * @returns {countdown}
      */
-    Calendar.prototype._init = function (el, options) {
+    Countdown.prototype._init = function (el, options) {
         // Call to its parent init method
         parent._init.call(this, el, options);
 
@@ -6417,657 +8462,158 @@
          * @type {Object}
          * @private
          */
-        var that = this;
-
-        // cloneNode(true) > parameters is required. Opera & IE throws and internal error. Opera mobile breaks.
-        this._snippet = this._el.cloneNode(true);
-
-        /**
-         * Object to mange the date and its ranges.
-         * @type {Object}
-         * @private
-         */
-        this._dates = {
-            'range': {}
-        };
-
-        this._dates.today = createDateObject('today');
-
-        this._dates.current = this._dates.today;
-
-        /**
-         * Date of selected day.
-         * @type {Object}
-         * @private
-         */
-        this._dates.selected = (function () {
-
-            // Get date from configuration or input value, if configured could be an Array with multiple selections
-            var selected = that._options.selected;
-
-            // Do it only if there are a "selected" parameter
-            if (!selected) { return selected; }
-
-            // Simple date selection
-            if (!Array.isArray(selected)) {
-
-                if (selected !== 'today') {
-                    // Return date object and update currentDate
-                    selected = that._dates.current = createDateObject(selected);
-
-                } else {
-                    selected = that._dates.today;
-                }
-
-            // Multiple date selection
-            } else {
-                selected.forEach(function (e, i){
-                    // Simple date
-                    if (!Array.isArray(e)) {
-                        selected[i] = (selected[i] !== 'today') ? createDateObject(e) : that._dates.today;
-                    // Range
-                    } else {
-                        selected[i][0] = (selected[i][0] !== 'today') ? createDateObject(e[0]) : that._dates.today;
-                        selected[i][1] = (selected[i][1] !== 'today') ? createDateObject(e[1]) : that._dates.today;
-                    }
-                });
-            }
-
-            return selected;
-        }());
-
-        // Today's date object
-        this._dates.today = createDateObject('today');
-
-        // Minimum selectable date
-        this._dates.range.from = (function () {
-
-            // Only works when there are a "from" parameter on configuration
-            if (that._options.from === undefined || !that._options.from) { return; }
-
-            // Return date object
-            return (that._options.from === 'today') ? that._dates.today : createDateObject(that._options.from);
-
-        }());
-
-        // Maximum selectable date
-        this._dates.range.to = (function () {
-
-            // Only works when there are a "to" parameter on configuration
-            if (that._options.to === undefined || !that._options.to) { return; }
-
-            // Return date object
-            return (that._options.to === 'today') ? that._dates.today : createDateObject(that._options.to);
-
-        }());
-
-        /**
-         * Template of previous arrow.
-         * @type {HTMLDivElement}
-         */
-        this._prev = document.createElement('div');
-        this._prev.setAttribute('aria-controls', 'ch-calendar-grid-' + this.uid);
-        this._prev.setAttribute('role', 'button');
-        this._prev.setAttribute('aria-hidden', 'false');
-        tiny.addClass(this._prev, 'ch-calendar-prev');
-
-        /**
-         * Template of next arrow.
-         * @type {HTMLDivElement}
-         */
-        this._next = document.createElement('div');
-        this._next.setAttribute('aria-controls', 'ch-calendar-grid-' + this.uid);
-        this._next.setAttribute('role', 'button');
-        this._next.setAttribute('aria-hidden', 'false');
-        tiny.addClass(this._next, 'ch-calendar-next');
-
-
-        // Show or hide arrows depending on "from" and "to" limits
-        tiny.on(this._prev, ch.onpointertap, function (event) {
-            event.preventDefault();
-            that.prevMonth();
-        });
-        tiny.on(this._next, ch.onpointertap, function (event) {
-            event.preventDefault();
-            that.nextMonth();
-        });
-
-        /**
-         * The calendar container.
-         * @type {HTMLElement}
-         */
-        this.container = this._el;
-        this.container.insertBefore(this._prev, this.container.firstChild);
-        this.container.insertBefore(this._next, this.container.firstChild);
-        tiny.addClass(this.container, 'ch-calendar');
-        this.container.insertAdjacentHTML('beforeend', this._createTemplate(this._dates.current));
-
-        this._updateControls();
-
-        // Avoid selection on the component
-        that.container.setAttribute('unselectable', 'on');
-        tiny.addClass(that.container, 'ch-user-no-select');
-
-        return this;
-    };
-
-    /**
-     * Checks if it has got a previous month to show depending on "from" limit.
-     * @function
-     * @private
-     */
-    Calendar.prototype._hasPrevMonth = function () {
-        return this._dates.range.from === undefined || !(this._dates.range.from.month >= this._dates.current.month && this._dates.range.from.year >= this._dates.current.year);
-    };
-
-    /**
-     * Checks if it has got a next month to show depending on "to" limits.
-     * @function
-     * @private
-     */
-    Calendar.prototype._hasNextMonth = function () {
-        return this._dates.range.to === undefined || !(this._dates.range.to.month <= this._dates.current.month && this._dates.range.to.year <= this._dates.current.year);
-    };
-
-    /**
-     * Refresh arrows visibility depending on "from" and "to" limits.
-     * @function
-     * @private
-     */
-    Calendar.prototype._updateControls = function () {
-
-        // Show previous arrow when it's out of limit
-        if (this._hasPrevMonth()) {
-            tiny.removeClass(this._prev, 'ch-hide');
-            this._prev.setAttribute('aria-hidden', 'false');
-
-        // Hide previous arrow when it's out of limit
-        } else {
-            tiny.addClass(this._prev, 'ch-hide');
-            this._prev.setAttribute('aria-hidden', 'true');
-        }
-
-        // Show next arrow when it's out of limit
-        if (this._hasNextMonth()) {
-            tiny.removeClass(this._next, 'ch-hide');
-            this._next.setAttribute('aria-hidden', 'false');
-
-        // Hide next arrow when it's out of limit
-        } else {
-            tiny.addClass(this._next, 'ch-hide');
-            this._next.setAttribute('aria-hidden', 'true');
-        }
-
-        return this;
-    };
-
-    /**
-     * Refresh the structure of Calendar's table with a new date.
-     * @function
-     * @private
-     */
-    Calendar.prototype._updateTemplate = function (date) {
-        var month;
-
-        // Update "currentDate" object
-        this._dates.current = (typeof date === 'string') ? createDateObject(date) : date;
-
-        // Delete old table
-        month = this.container.querySelector('table');
-        this.container.removeChild(month);
-
-        // Append new table to content
-        this.container.insertAdjacentHTML('beforeend', this._createTemplate(this._dates.current));
-
-        // Refresh arrows
-        this._updateControls();
-
-        return this;
-    };
-
-    /**
-     * Creates a complete month in a table.
-     * @function
-     * @private
-     */
-    Calendar.prototype._createTemplate = function (date) {
-
-        /**
-         * Reference to context of an instance.
-         * @type {Object}
-         * @private
-         */
         var that = this,
-            cell,
-            positive,
-            day,
-            isSelected,
-            thead = (function () {
 
-                // Create thead structure
-                var t = ['<thead><tr role="row">'],
-                    dayIndex;
+            /**
+             * Create the "id" attribute.
+             * @type {String}
+             * @private
+             */
+            messageID = 'ch-countdown-message-' + that.uid,
 
-                // Add week names
-                for (dayIndex = 0; dayIndex < 7; dayIndex += 1) {
-                    t.push('<th role="columnheader">' + that._defaults.weekdays[dayIndex] + '</th>');
-                }
+           /**
+             * Singular or Plural message depending on amount of remaining characters.
+             * @type {String}
+             * @private
+             */
+            message;
 
-                // Close thead structure
-                t.push('</tr></thead>');
-
-                // Join structure and return
-                return t.join('');
-
-            }()),
-
-            table = [
-                '<table class="ch-calendar-month" role="grid" id="ch-calendar-grid-' + that.uid + '">',
-                '<caption>' + that._defaults.monthsNames[date.month - 1] + ' - ' + date.year + '</caption>',
-                thead
-            ],
-
-            // Total amount of days into month
-            cells = (function () {
-
-                // Amount of days of current month
-                var currentMonth = new Date(date.year, date.month, 0).getDate(),
-
-                // Amount of days of previous month
-                    prevMonth = new Date([date.year, date.month, '01'].join('/')).getDay(),
-
-                // Merge amount of previous and current month
-                    subtotal = prevMonth + currentMonth,
-
-                // Amount of days into last week of month
-                    latest = subtotal % 7,
-
-                // Amount of days of next month
-                    nextMonth = (latest > 0) ? 7 - latest : 0;
-
-                return {
-                    'previous': prevMonth,
-                    'subtotal': subtotal,
-                    'total': subtotal + nextMonth
-                };
-
-            }());
-
-        table.push('<tbody><tr class="ch-calendar-week" role="row">');
-
-        // Iteration of weekdays
-        for (cell = 0; cell < cells.total; cell += 1) {
-
-            // Push an empty cell on previous and next month
-            if (cell < cells.previous || cell > cells.subtotal - 1) {
-                table.push('<td role="gridcell" class="ch-calendar-other">X</td>');
-            } else {
-
-                // Positive number of iteration
-                positive = cell + 1;
-
-                // Day number
-                day = positive - cells.previous;
-
-                // Define if it's the day selected
-                isSelected = this._isSelected(date.year, date.month, day);
-
-                // Create cell
-                table.push(
-                    // Open cell structure including WAI-ARIA and classnames space opening
-                    '<td role="gridcell"' + (isSelected ? ' aria-selected="true"' : '') + ' class="ch-calendar-day',
-
-                    // Add Today classname if it's necesary
-                    (date.year === that._dates.today.year && date.month === that._dates.today.month && day === that._dates.today.day) ? ' ch-calendar-today' : null,
-
-                    // Add Selected classname if it's necesary
-                    (isSelected ? ' ch-calendar-selected ' : null),
-
-                    // From/to range. Disabling cells
-                    (
-                        // Disable cell if it's out of FROM range
-                        (that._dates.range.from && day < that._dates.range.from.day && date.month === that._dates.range.from.month && date.year === that._dates.range.from.year) ||
-
-                        // Disable cell if it's out of TO range
-                        (that._dates.range.to && day > that._dates.range.to.day && date.month === that._dates.range.to.month && date.year === that._dates.range.to.year)
-
-                    ) ? ' ch-calendar-disabled' : null,
-
-                    // Close classnames attribute and print content closing cell structure
-                    '">' + day + '</td>'
-                );
-
-                // Cut week if there are seven days
-                if (positive % 7 === 0) {
-                    table.push('</tr><tr class="ch-calendar-week" role="row">');
-                }
-
-            }
-
-        }
-
-        table.push('</tr></tbody></table>');
-
-        // Return table object
-        return table.join('');
-
-    };
-
-    /**
-     * Checks if a given date is into 'from' and 'to' dates.
-     * @function
-     * @private
-     */
-    Calendar.prototype._isInRange = function (date) {
-        var inRangeFrom = true,
-            inRangeTo = true;
-
-        if (this._dates.range.from) {
-            inRangeFrom = (this._dates.range.from.native <= date.native);
-        }
-
-        if (this._dates.range.to) {
-            inRangeTo = (this._dates.range.to.native >= date.native);
-        }
-
-        return inRangeFrom && inRangeTo;
-    };
-
-    /**
-     * Indicates if an specific date is selected or not (including date ranges and simple dates).
-     * @function
-     * @private
-     */
-    Calendar.prototype._isSelected = function (year, month, day) {
-        var yepnope;
-
-        if (!this._dates.selected) { return; }
-
-        yepnope = false;
-
-        // Simple selection
-        if (!Array.isArray(this._dates.selected)) {
-            if (year === this._dates.selected.year && month === this._dates.selected.month && day === this._dates.selected.day) {
-                yepnope = true;
-                return yepnope;
-            }
-
-        // Multiple selection (ranges)
-        } else {
-            this._dates.selected.forEach(function (e) {
-                // Simple date
-                if (!Array.isArray(e)) {
-                    if (year === e.year && month === e.month && day === e.day) {
-                        yepnope = true;
-                        return yepnope;
-                    }
-                // Range
-                } else {
-                    if (
-                        (year >= e[0].year && month >= e[0].month && day >= e[0].day) &&
-                            (year <= e[1].year && month <= e[1].month && day <= e[1].day)
-                    ) {
-                        yepnope = true;
-                        return yepnope;
-                    }
-                }
+        /**
+         * The countdown trigger.
+         * @type {HTMLTextAreaElement}
+         * @example
+         * // Gets the countdown trigger.
+         * countdown.trigger;
+         */
+        this.trigger = this._el;
+        'keyup keypress keydown input paste cut'.split(' ')
+            .forEach(function(name) {
+                tiny.on(that.trigger, name, function () { that._count(); });
             });
-        }
 
-        return yepnope;
+        /**
+         * Amount of free characters until full the field.
+         * @type {Number}
+         * @private
+         */
+        that._remaining = that._options.max - that._contentLength();
+
+        // Update the message
+        message = ((that._remaining === 1) ? that._options.singular : that._options.plural);
+
+        /**
+         * The countdown container.
+         * @type {HTMLParagraphElement}
+         */
+        that.container = (function () {
+            var parent = tiny.parent(that._el);
+            parent.insertAdjacentHTML('beforeend', '<span class="ch-countdown ch-form-hint" id="' + messageID + '">' + message.replace('#', that._remaining) + '</span>');
+
+            return parent.querySelector('#' + messageID);
+        }());
+
+        this.on('disable', this._removeError);
+
+        return this;
     };
 
     /**
-     * Selects a specific date or returns the selected date.
-     * @memberof! ch.Calendar.prototype
+     * Returns the length of value.
      * @function
-     * @param {String} [date] A given date to select. The format of the given date should be "YYYY/MM/DD".
-     * @returns {calendar}
-     * @example
-     * // Returns the selected date.
-     * calendar.select();
-     * @example
-     * // Select a specific date.
-     * calendar.select('2014/05/28');
+     * @private
+     * @returns {Number}
      */
-    Calendar.prototype.select = function (date) {
-        // Getter
-        if (!date) {
-            if (this._dates.selected === undefined) {
-                return;
+    Countdown.prototype._contentLength = function () {
+        return this._el.value.length;
+    };
+
+    /**
+     * Process input of data on form control and updates remaining amount of characters or limits the content length. Also, change the visible message of remaining characters.
+     * @function
+     * @private
+     * @returns {countdown}
+     */
+    Countdown.prototype._count = function () {
+
+        if (!this._enabled) {
+            return this;
+        }
+
+        var length = this._contentLength(),
+            message;
+
+        this._remaining = this._options.max - length;
+
+        // Limit Count alert the user
+        if (length <= this._options.max) {
+
+            if (this._exceeded) {
+                // Update exceeded flag
+                this._exceeded = false;
+                this._removeError();
             }
-            return FORMAT_dates[this._options.format](this._dates.selected);
+
+        } else if (length > this._options.max) {
+
+            /**
+             * Event emitted when the lenght of characters is exceeded.
+             * @event ch.Countdown#exceed
+             * @example
+             * // Subscribe to "exceed" event.
+             * countdown.on('exceed', function () {
+             *     // Some code here!
+             * });
+             */
+            this.emit('exceed');
+
+            // Update exceeded flag
+            this._exceeded = true;
+
+            this.trigger.setAttribute('aria-invalid', 'true');
+            tiny.addClass(this.trigger, 'ch-validation-error');
+
+            tiny.addClass(this.container, 'ch-countdown-exceeded');
         }
 
-        // Setter
-        var newDate = createDateObject(date);
+        // Change visible message of remaining characters
+        // Singular or Plural message depending on amount of remaining characters
+        message = (this._remaining !== 1 ? this._options.plural : this._options.singular).replace(/\#/g, this._remaining);
 
+        // Update DOM text
+        this.container.innerText  = message;
 
-        if (!this._isInRange(newDate)) {
-            return this;
-        }
+        return this;
 
-        // Update selected date
-        this._dates.selected = (date === 'today') ? this._dates.today : newDate;
+    };
 
-        // Create a new table of selected month
-        this._updateTemplate(this._dates.selected);
+     /**
+     * Process input of data on form control and updates remaining amount of characters or limits the content length. Also, change the visible message of remaining characters.
+     * @function
+     * @private
+     * @returns {countdown}
+     */
+    Countdown.prototype._removeError = function () {
+        tiny.removeClass(this.trigger, 'ch-validation-error');
+        this.trigger.setAttribute('aria-invalid', 'false');
 
-        /**
-         * Event emitted when a date is selected.
-         * @event ch.Calendar#select
-         * @example
-         * // Subscribe to "select" event.
-         * calendar.on('select', function () {
-         *     // Some code here!
-         * });
-         */
-        this.emit('select');
+        tiny.removeClass(this.container, 'ch-countdown-exceeded');
 
         return this;
     };
 
     /**
-     * Returns date of today
-     * @memberof! ch.Calendar.prototype
-     * @function
-     * @returns {String} The date of today
-     * @example
-     * // Get the date of today.
-     * var today = calendar.getToday();
-     */
-    Calendar.prototype.getToday = function () {
-        return FORMAT_dates[this._options.format](this._dates.today);
-    };
-
-    /**
-     * Moves to the next month.
-     * @memberof! ch.Calendar.prototype
-     * @function
-     * @returns {calendar}
-     * @example
-     * // Moves to the next month.
-     * calendar.nextMonth();
-     */
-    Calendar.prototype.nextMonth = function () {
-        if (!this._enabled || !this._hasNextMonth()) {
-            return this;
-        }
-
-        // Next year
-        if (this._dates.current.month === 12) {
-            this._dates.current.month = 0;
-            this._dates.current.year += 1;
-        }
-
-        // Create a new table of selected month
-        this._updateTemplate([this._dates.current.year, this._dates.current.month + 1, '01'].join('/'));
-
-        /**
-         * Event emitted when a next month is shown.
-         * @event ch.Calendar#nextmonth
-         * @example
-         * // Subscribe to "nextmonth" event.
-         * calendar.on('nextmonth', function () {
-         *     // Some code here!
-         * });
-         */
-        this.emit('nextmonth');
-
-        return this;
-    };
-
-    /**
-     * Move to the previous month.
-     * @memberof! ch.Calendar.prototype
-     * @function
-     * @returns {calendar}
-     * @example
-     * // Moves to the prev month.
-     * calendar.prevMonth();
-     */
-    Calendar.prototype.prevMonth = function () {
-
-        if (!this._enabled || !this._hasPrevMonth()) {
-            return this;
-        }
-
-        // Previous year
-        if (this._dates.current.month === 1) {
-            this._dates.current.month = 13;
-            this._dates.current.year -= 1;
-        }
-
-        // Create a new table to the prev month
-        this._updateTemplate([this._dates.current.year, this._dates.current.month - 1, '01'].join('/'));
-
-        /**
-         * Event emitted when a previous month is shown.
-         * @event ch.Calendar#prevmonth
-         * @example
-         * // Subscribe to "prevmonth" event.
-         * calendar.on('prevmonth', function () {
-         *     // Some code here!
-         * });
-         */
-        this.emit('prevmonth');
-
-        return this;
-    };
-
-    /**
-     * Move to the next year.
-     * @memberof! ch.Calendar.prototype
-     * @function
-     * @returns {calendar}
-     * @example
-     * // Moves to the next year.
-     * calendar.nextYear();
-     */
-    Calendar.prototype.nextYear = function () {
-
-        if (!this._enabled || !this._hasNextMonth()) {
-            return this;
-        }
-
-        // Create a new table of selected month
-        this._updateTemplate([this._dates.current.year + 1, this._dates.current.month, '01'].join('/'));
-
-        /**
-         * Event emitted when a next year is shown.
-         * @event ch.Calendar#nextyear
-         * @example
-         * // Subscribe to "nextyear" event.
-         * calendar.on('nextyear', function () {
-         *     // Some code here!
-         * });
-         */
-        this.emit('nextyear');
-
-        return this;
-    };
-
-    /**
-     * Move to the previous year.
-     * @memberof! ch.Calendar.prototype
-     * @function
-     * @returns {calendar}
-     * @example
-     * // Moves to the prev year.
-     * calendar.prevYear();
-     */
-    Calendar.prototype.prevYear = function () {
-
-        if (!this._enabled || !this._hasPrevMonth()) {
-            return this;
-        }
-
-        // Create a new table to the prev year
-        this._updateTemplate([this._dates.current.year - 1, this._dates.current.month, '01'].join('/'));
-
-        /**
-         * Event emitted when a previous year is shown.
-         * @event ch.Calendar#prevyear
-         * @example
-         * // Subscribe to "prevyear" event.
-         * calendar.on('prevyear', function () {
-         *     // Some code here!
-         * });
-         */
-        this.emit('prevyear');
-
-        return this;
-    };
-
-    /**
-     * Set a minimum selectable date.
-     * @memberof! ch.Calendar.prototype
-     * @function
-     * @param {String} date A given date to set as minimum selectable date. The format of the given date should be "YYYY/MM/DD".
-     * @returns {calendar}
-     * @example
-     * // Set a minimum selectable date.
-     * calendar.setFrom('2010/05/28');
-     */
-    Calendar.prototype.setFrom = function (date) {
-        // this from is a reference to the global form
-        this._dates.range.from = (date === 'auto') ? undefined : createDateObject(date);
-        this._updateTemplate(this._dates.current);
-
-        return this;
-    };
-
-    /**
-     * Set a maximum selectable date.
-     * @memberof! ch.Calendar.prototype
-     * @function
-     * @param {String} date A given date to set as maximum selectable date. The format of the given date should be "YYYY/MM/DD".
-     * @returns {calendar}
-     * @example
-     * // Set a maximum selectable date.
-     * calendar.setTo('2014/05/28');
-     */
-    Calendar.prototype.setTo = function (date) {
-        // this to is a reference to the global to
-        this._dates.range.to = (date === 'auto') ? undefined : createDateObject(date);
-        this._updateTemplate(this._dates.current);
-
-        return this;
-    };
-
-    /**
-     * Destroys a Calendar instance.
-     * @memberof! ch.Calendar.prototype
+     * Destroys a Countdown instance.
+     * @memberof! ch.Countdown.prototype
      * @function
      * @example
-     * // Destroy a calendar
-     * calendar.destroy();
-     * // Empty the calendar reference
-     * calendar = undefined;
+     * // Destroy a countdown
+     * countdown.destroy();
+     * // Empty the countdown reference
+     * countdown = undefined;
      */
-    Calendar.prototype.destroy = function () {
-
-        this._el.parentNode.replaceChild(this._snippet, this._el);
+    Countdown.prototype.destroy = function () {
+        var parentElement = tiny.parent(this.container);
+        parentElement.removeChild(this.container);
 
         tiny.trigger(window.document, ch.onlayoutchange);
 
@@ -7077,7 +8623,7 @@
     };
 
     // Factorize
-    ch.factory(Calendar, normalizeOptions);
+    ch.factory(Countdown, normalizeOptions);
 
 }(this, this.ch));
 
@@ -7628,20 +9174,6 @@
     ch.factory(Datepicker);
 
 }(this, this.ch));
-
-(function (Datepicker) {
-    'use strict';
-
-    /**
-     * Configuration by default.
-     * @type {Object}
-     * @private
-     */
-    Datepicker.prototype._defaults.align = 'right';
-    //ch-form-icon-inner
-
-
-}(this.ch.Datepicker));
 
 (function (window, ch) {
     'use strict';
@@ -8257,3 +9789,108 @@
     ch.factory(Autocomplete);
 
 }(this, this.ch));
+
+(function (Autocomplete, ch) {
+    'use strict';
+    /**
+     * Congfigure shortcuts to navigate and set values, or cancel the typed text
+     * @memberof! ch.Autocomplete.prototype
+     * @function
+     * @private
+     * @returns {autocomplete}
+     */
+    Autocomplete.prototype._configureShortcuts = function () {
+
+        /**
+         * Reference to context of an instance.
+         * @type {Object}
+         * @private
+         */
+        var that = this;
+
+        // Shortcuts
+        ch.shortcuts.add(ch.onkeyenter, this.uid, function (event) {
+            event.preventDefault();
+            that._selectSuggestion();
+        });
+
+        ch.shortcuts.add(ch.onkeyesc, this.uid, function () {
+            that.hide();
+            that._el.value = that._originalQuery;
+        });
+
+        ch.shortcuts.add(ch.onkeyuparrow, this.uid, function (event) {
+            event.preventDefault();
+
+            var value;
+
+            // change the selected value & stores the future HTMLInputElement value
+            if (that._highlighted === null) {
+
+                that._highlighted = that._suggestionsQuantity - 1;
+                value = that._suggestions[that._highlighted];
+
+            } else if (that._highlighted <= 0) {
+
+                this._prevHighlighted = this._currentHighlighted = null;
+                value = that._currentQuery;
+
+            } else {
+
+                that._highlighted -= 1;
+                value = that._suggestions[that._highlighted];
+
+            }
+
+            that._toogleHighlighted();
+
+            if (!that._options.html) {
+                that._el.value = value;
+            }
+
+        });
+
+        ch.shortcuts.add(ch.onkeydownarrow, this.uid, function () {
+            var value;
+
+            // change the selected value & stores the future HTMLInputElement value
+            if (that._highlighted === null) {
+
+                that._highlighted = 0;
+
+                value = that._suggestions[that._highlighted];
+
+            } else if (that._highlighted >= that._suggestionsQuantity - 1) {
+
+                that._highlighted = null;
+                value = that._currentQuery;
+
+            } else {
+
+                that._highlighted += 1;
+                value = that._suggestions[that._highlighted];
+
+            }
+
+            that._toogleHighlighted();
+
+            if (!that._options.html) {
+                that._el.value = value;
+            }
+
+        });
+
+        // Activate the shortcuts for this instance
+        this._popover.on('show', function () { ch.shortcuts.on(that.uid); });
+
+        // Deactivate the shortcuts for this instance
+        this._popover.on('hide', function () { ch.shortcuts.off(that.uid); });
+
+        this.on('destroy', function () {
+            ch.shortcuts.remove(this.uid);
+        });
+
+        return this;
+    };
+
+}(this.ch.Autocomplete, this.ch));

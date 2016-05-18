@@ -1,3 +1,82 @@
+@import 'mlcolors';
+@import 'tabs';
+@import '../../bower_components/chico/dist/ui/chico';
+@import '../../bower_components/lightslider/dist/css/lightslider';
+
 body{
+	background-color: $body-color;
+}
+
+
+h1 {
+	font-size: 32px;
+	font-weight: bold;
+}
+.container {
+	padding: 10px;
+	background-color: #DDD;
+}
+
+.img_container {
+	background: #fff;
+	box-shadow: 0px 3px 3px $shadow-color;
+	border: 1px solid $border-color;
+	padding: 10px;
+	text-align: center;
+
+	img {
+		width: 340px;
+		height: 340px;
+	}
+}
+
+.data_container {
+	background: #fff;
+	box-shadow: 0px 3px 3px $shadow-color;
+	border: 1px solid $border-color;
+	min-height: 370px;
+	padding: 20px;
+}
+
+.carousel_img {
+	width: 100px;
+	height: 100px;
+	box-shadow: 0px 3px 3px $shadow-color;
+	border: 1px solid $border-color;
+}
+
+.bt_buy {
+	min-width: 100px;
+}
+
+.txt_price {
+	font-size: 32px;
+	font-weight: bold;
+	sup {
+		font-size: 20px;
+		font-weight: normal;
+	}
+}
+
+
+.mg-top-10 {
+	margin-top: 10px;
+}
+
+.mg-top-20 {
+	margin-top: 20px;
+}
+
+.slider_buttons {
+	font-size: 30px;
+	font-weight: bold;
+}
+
+.msguser {
 	background-color: white;
+}
+
+.comment {
+	background-color: #ddd;
+	padding-left: 45px;
 }
