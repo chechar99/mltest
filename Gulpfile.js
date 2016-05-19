@@ -65,8 +65,8 @@ var settings = {
 
 var jslibs = [
 	'bower_components/jquery/dist/jquery.js',
-	'bower_components/tiny.js/dist/tiny.js',
-	'bower_components/chico/dist/ui/chico.js',
+	// 'bower_components/tiny.js/dist/tiny.js',
+	// 'bower_components/chico/dist/ui/chico.js',
 	'bower_components/lightslider/dist/js/lightslider.js',
 	'app/scripts/main.js',
 ];
