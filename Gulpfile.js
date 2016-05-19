@@ -63,6 +63,14 @@ var settings = {
   }
 };
 
+var jslibs = [
+	'bower_components/jquery/dist/jquery.js',
+	'bower_components/tiny.js/dist/tiny.js',
+	'bower_components/chico/dist/ui/chico.js',
+	'bower_components/lightslider/dist/js/lightslider.js',
+	'app/scripts/main.js',
+];
+
 // ----- DEFAULT TASK -----
 gulp.task('default', ['build', 'watch']);
 gulp.task('build', ['web', 'script','coffee',  'style', 'images', 'icons', 'libraries']);
@@ -93,6 +101,23 @@ gulp.task('web', function(){
 
 // ----- SCRIPT TASK -----
 gulp.task('script', function() {
+	gulp.src(jslibs)
+		.pipe(plumber())
+		.pipe(babel({
+			presets: ['es2015']
+		}))
+		.pipe(beautify())
+		.pipe(concat(settings.paths.scripts.distFile))
+		.pipe(gulp.dest(settings.paths.scripts.dist))
+		.pipe(gulpIf(settings.production, uglify()))
+		.pipe(rename({
+			suffix: ".min"
+		}))
+		.pipe(gulp.dest(settings.paths.scripts.dist));
+});
+
+// ----- SCRIPT TASK -----
+gulp.task('oldscript', function() {
 	gulp.src(settings.paths.scripts.js.src)
 		.pipe(plumber())
 		.pipe(babel({
@@ -156,14 +181,14 @@ gulp.task('libraries', function() {
 		.pipe(plumber())
 
 		//---------- js -------
-		.pipe(jsFilter)
-		.pipe(gulp.dest(settings.paths.scripts.dist))
-		.pipe(uglify())
-		.pipe(rename({
-			suffix: ".min"
-		}))
-		.pipe(gulp.dest(settings.paths.scripts.dist))
-		.pipe(jsFilter.restore)
+		// .pipe(jsFilter)
+		// .pipe(gulp.dest(settings.paths.scripts.dist))
+		// .pipe(uglify())
+		// .pipe(rename({
+		// 	suffix: ".min"
+		// }))
+		// .pipe(gulp.dest(settings.paths.scripts.dist))
+		// .pipe(jsFilter.restore)
 
 		//---------- css -------
 		.pipe(cssFilter)
